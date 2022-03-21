@@ -35,16 +35,16 @@ for page in pages:
 		item_dict = wd_item.get()
 		qid = wd_item.title()
 	except:
-		print 'Huh - no page found'
+		print ('Huh - no page found')
 		continue
 	# print item_dict
 	# exit()
 
-	print "\n" + qid
+	print ("\n" + qid)
 	try:
 		p373 = item_dict['claims']['P373']
 	except:
-		print 'Huh - no P373 found'
+		print ('Huh - no P373 found')
 		continue
 	p373_check = 0
 	for clm in p373:
@@ -53,11 +53,11 @@ for page in pages:
 	# If we have a P910 value, switch to using that item
 	try:
 		existing_id = item_dict['claims']['P910']
-		print 'P910 exists, following that.'
+		print ('P910 exists, following that.')
 		for clm2 in existing_id:
 			wd_item = clm2.getTarget()
 			item_dict = wd_item.get()
-			print wd_item.title()
+			print (wd_item.title())
 	except:
 		null = 0
 
@@ -76,7 +76,7 @@ for page in pages:
 			try:
 				sitelink_page = pywikibot.Page(commons, commonscat)
 			except:
-				print 'Found a bad sitelink'
+				print ('Found a bad sitelink')
 				# clm.changeTarget("", summary=u"Remove non-functional value of P373")
 			else:
 				# Check the category to see if it already has a Wikidata item
@@ -89,20 +89,20 @@ for page in pages:
 					# That didn't work, add it to the Wikidata entry
 					data = {'sitelinks': [{'site': 'commonswiki', 'title': u"Category:" + val}]}
 					try:
-						print val
-						print data
+						print (val)
+						print (data)
 						# text = raw_input("Save? ")
 						# if text == 'y':
 						wd_item.editEntity(data, summary=u'Copy from P373 to commons sitelink')
 						nummodified += 1
-						print nummodified
+						print (nummodified)
 					except:
-						print 'Edit failed'
+						print ('Edit failed')
 
 			if nummodified >= maxnum:
-				print 'Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!'
+				print ('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
 				exit()
 
-print 'Done! Edited ' + str(nummodified) + ' entries'
+print ('Done! Edited ' + str(nummodified) + ' entries')
 		
 # EOF
