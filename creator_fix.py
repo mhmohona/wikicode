@@ -26,7 +26,7 @@ template = pywikibot.Page(site, 'Template:Wikidata person')
 uses = template.embeddedin(namespaces='6')
 
 for page in uses:
-    print page.title()
+    print (page.title())
     try:
         wd_item = pywikibot.ItemPage.fromPage(page)
         if wd_item != -1:
@@ -36,7 +36,7 @@ for page in uses:
     except:
         wd_id = str(-1)
 
-    print page.text
+    print (page.text)
     try:
         target = (page.text.split("{{Wikidata person|1="))[1].split("}}")[0]
     except:
@@ -44,18 +44,18 @@ for page in uses:
             target = (page.text.split("{{Wikidata person|"))[1].split("}}")[0]
         except:
             continue
-    print target
+    print (target)
 
     targetitem = pywikibot.ItemPage(repo, target)
     targetitem.get()
     if targetitem.claims:
         if 'P1472' in targetitem.claims: # instance of
             print(targetitem.claims['P1472'][0].getTarget())
-            print "{{Wikidata person|1="+target+"}}"
+            print ("{{Wikidata person|1="+target+"}}")
             target_text = page.text
             target_text = target_text.replace("{{Wikidata person|1="+target+"}}", "{{Creator:"+targetitem.claims['P1472'][0].getTarget()+"}}")
             target_text = target_text.replace("{{Wikidata person|"+target+"}}", "{{Creator:"+targetitem.claims['P1472'][0].getTarget()+"}}")
-            print target_text
+            print (target_text)
             page.text = target_text.strip()
             # text = raw_input("Save on Commons? ")
             # if text == 'y':
