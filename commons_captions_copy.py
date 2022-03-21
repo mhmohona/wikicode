@@ -84,13 +84,13 @@ def set_caption(site, itemtitle, caption,language='en'):
      # test.login()
      # prettyPrint(test)
      # caption = 'Sala Sao Paulo, Brazil'
-     print 'test'
+     print ('test')
      site.login()
-     print site.logged_in()
-     print site.getuserinfo()
+     print (site.logged_in())
+     print (site.getuserinfo())
      # site.TokenWallet.load_tokens()
      # caption = caption.replace(' ','%20')
-     print caption
+     print (caption)
      params = { 'action' :'wbsetlabel', 
                 'format' : 'json',
                 # 'lgname' : commons_testbot_username,
@@ -98,7 +98,7 @@ def set_caption(site, itemtitle, caption,language='en'):
                 'id': itemtitle,
                 'language' : language,
                 'value': caption}
-     print params
+     print (params)
      # print pywikibot.data.api.encode_url(params)
      request = pywikibot.data.api.Request(site=site, parameters=params)
      return request.submit()
@@ -128,18 +128,18 @@ def check_and_set_caption(target):
     # prettyPrint(userinfo)
     # return 1
 
-    print target.title()
+    print (target.title())
     filetext = target.get()
     if '{{en|1=' in filetext:
         caption = filetext.split('{{en|1=')[1].split('}}')[0]
-        print caption
+        print (caption)
     # Get the media ID
     mid_temp = get_mid(commons, target.title())
     prettyPrint(mid_temp)
     for val in mid_temp['query']['pages']:
         # print val
         mid = val
-    print mid
+    print (mid)
 
     captions = get_caption(commons, 'M'+str(mid))
     prettyPrint(captions)
