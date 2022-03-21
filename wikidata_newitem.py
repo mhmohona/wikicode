@@ -48,7 +48,7 @@ def newitem(category, items):
 	new_item = pywikibot.ItemPage(repo)
 	new_item.editLabels(labels={"en":category.title().replace('Category:','')}, summary="Creating item")
 	candidate_item = pywikibot.ItemPage(repo, new_item.getID())
-	print candidate_item
+	print (candidate_item)
 
 	data = {'sitelinks': [{'site': 'commonswiki', 'title': category.title()}]}
 	candidate_item.editEntity(data, summary=u'Add commons sitelink')
@@ -63,7 +63,7 @@ def newitem(category, items):
 			candidate_item.addClaim(claim, summary=u'Setting '+item[0]+' value')
 			claim.addSources([statedin, retrieved], summary=u'Add source.')
 		except:
-			print "That didn't work"
+			print ("That didn't work")
 	return
 
 category = 'Category:People by name'
@@ -82,10 +82,10 @@ for targetcat in pagegenerators.SubCategoriesPageGenerator(cat, recurse=False):
 	try:
 		wd_item = pywikibot.ItemPage.fromPage(targetcat)
 		item_dict = wd_item.get()
-		print wd_item.title()
+		print (wd_item.title())
 		continue
 	except:
-		print targetcat.title()
+		print (targetcat.title())
 
 	# Check the database to see if there are open matches
 	mycursor.execute('SELECT * FROM candidates WHERE category = "' + targetcat.title() + '"')
@@ -93,7 +93,7 @@ for targetcat in pagegenerators.SubCategoriesPageGenerator(cat, recurse=False):
 	qidlist = []
 	abort = 0
 	for result in myresult:
-		print myresult
+		print (myresult)
 		if result[3] == 0:
 			abort = 1
 		qidlist.append(result[1])
@@ -106,7 +106,7 @@ for targetcat in pagegenerators.SubCategoriesPageGenerator(cat, recurse=False):
 	if searchname2 != '':
 		searchname = searchname2
 	wikidataEntries = search_entities(repo, searchname)
-	print wikidataEntries
+	print (wikidataEntries)
 	abort = 0
 	if wikidataEntries['search'] != []:
 		results = wikidataEntries['search']
@@ -132,16 +132,14 @@ for targetcat in pagegenerators.SubCategoriesPageGenerator(cat, recurse=False):
 	if " births]]" in target_text:
 		test = target_text.split(" births]]")[0]
 		test = test.split('[[Category:')[-1]
-		print test
-		items.append(['P569',pywikibot.WbTime(site=repo, year=test, month=01, day=01,
-precision='year')])
+		print (test)
+		items.append(['P569',pywikibot.WbTime(site=repo, year=test, month=01, day=01, precision='year')])
 	if " deaths]]" in target_text:
 		test = target_text.split(" deaths]]")[0]
 		test = test.split('[[Category:')[-1]
-		print test
-		items.append(['P570',pywikibot.WbTime(site=repo, year=test, month=01, day=01,
-precision='year')])
-	print items
+		print (test)
+		items.append(['P570',pywikibot.WbTime(site=repo, year=test, month=01, day=01, precision='year')])
+	print (items)
 	test = newitem(targetcat, items)
 	i += 1
 	if i > maxnum:
