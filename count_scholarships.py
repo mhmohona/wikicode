@@ -41,8 +41,8 @@ numtimes = np.zeros(10)
 for letter in counts:
     numtimes[counts[letter]] = numtimes[counts[letter]]  + 1
 
-print numtimes
-print sum(numtimes)
+print (numtimes)
+print (sum(numtimes))
 
 plot_bar_from_counter(counts)
 plt.savefig('scholarship_count.jpg')
