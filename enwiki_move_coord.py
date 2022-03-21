@@ -22,7 +22,7 @@ template = 'Infobox observatory'
 alt_template = 'Infobox Observatory'
 templateparam = 'coordinates'
 def movecoord(article):
-    print article.title()
+    print (article.title())
     if article.title() == 'Royal Observatory, Greenwich':
         return 0
     # article = pywikibot.Page(site, page)
@@ -36,11 +36,11 @@ def movecoord(article):
     try:
         infobox_text = article_text.split("{{"+template)[1]
     except:
-        print "That didn't work"
+        print ("That didn't work")
     if infobox_text == article_text:
         infobox_text = article_text.split("{{"+alt_template)[1]
         article_text = article_text.replace(template, alt_template)
-    print infobox_text
+    print (infobox_text)
 
     # infobox_text_copy = infobox_text
     # diff = 1
@@ -74,9 +74,9 @@ def movecoord(article):
     article_text = article_text.replace(coordinate+'\n','')
     article_text = article_text.replace(coordinate,'')
     article_text = article_text.replace('{{'+template,'{{'+template+'\n| '+templateparam+" = " + coordinate)
-    print '\n\n\n\n'
-    print article_text
-    print article.title()
+    print ('\n\n\n\n')
+    print (article_text)
+    print (article.title())
     text = raw_input("Save? ")
     if text == 'y':
         try:
@@ -84,7 +84,7 @@ def movecoord(article):
             article.save('Moving coordinates into infobox')
             return 1
         except:
-            print "That didn't work!"
+            print ("That didn't work!")
             return 0
 
     return 0
@@ -96,4 +96,4 @@ nummodified = 0
 for target in targetpages:
     i += 1
     nummodified += movecoord(target)
-    print str(nummodified) + ', ' + str(i) + 'checked'
+    print (str(nummodified) + ', ' + str(i) + 'checked')
