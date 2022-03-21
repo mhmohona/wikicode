@@ -33,7 +33,7 @@ for page in pages:
 		if "Category:South" in page.title():
 			trip = 1
 		else:
-			print page.title()
+			print (page.title())
 			continue
 	try:
 		# item_dict = page.get()
@@ -42,22 +42,22 @@ for page in pages:
 		item_dict = wd_item.get()
 		qid = wd_item.title()
 	except:
-		print 'Huh - no page found'
+		print ('Huh - no page found')
 		continue
 	# print item_dict
 	# exit()
 
-	print "\n" + qid
-	print page.title()
+	print ("\n" + qid)
+	print (page.title())
 
 	# If we have a P910 value, switch to using that item
 	try:
 		existing_id = item_dict['claims']['P910']
-		print 'P910 exists, following that.'
+		print ('P910 exists, following that.')
 		for clm2 in existing_id:
 			wd_item = clm2.getTarget()
 			item_dict = wd_item.get()
-			print wd_item.title()
+			print (wd_item.title())
 	except:
 		null = 0
 
@@ -69,23 +69,23 @@ for page in pages:
 		sitelink_check = 0
 	# Only attempt to do this if there is no existing sitelink
 	if sitelink_check == 0:
-		print sitelink_check
+		print (sitelink_check)
 		id_val = 0
 		target_text = page.get()
 		for i in range(0,len(templates)):
-			print templates[i]
+			print (templates[i])
 			try:
-				print templates[i]
+				print (templates[i])
 				value = (target_text.split("{{"+templates[i]+"|"))[1].split("}}")[0]
-				print value
+				print (value)
 				if value and id_val == 0:
 					id_val = value
 			except:
 				null = 1
 			try:
-				print templates[i]
+				print (templates[i])
 				value = (target_text.split("{{"+templates[i]+"|"))[1].split("|")[0]
-				print value
+				print (value)
 				if value and id_val == 0:
 					id_val = value
 			except:
@@ -96,13 +96,13 @@ for page in pages:
 				commonscat = u"Category:" + id_val
 			else:
 				commonscat = id_val
-			print commonscat
+			print (commonscat)
 			# exit()
 			# The commons category must already exist
 			try:
 				sitelink_page = pywikibot.Page(commons, commonscat)
 			except:
-				print 'Found a bad sitelink'
+				print ('Found a bad sitelink')
 				# clm.changeTarget("", summary=u"Remove non-functional value of P373")
 			else:
 				# Check the category to see if it already has a Wikidata item
@@ -114,7 +114,7 @@ for page in pages:
 					try:
 						text = commonscat_page.get()
 					except:
-						print 'Commons category does not exist - fix that?'
+						print ('Commons category does not exist - fix that?')
 						text = raw_input("Continue? ")
 						continue
 
@@ -122,21 +122,21 @@ for page in pages:
 						# That didn't work, add it to the Wikidata entry
 						data = {'sitelinks': [{'site': 'commonswiki', 'title': commonscat}]}
 						try:
-							print id_val
-							print data
-							print page.title()
+							print (id_val)
+							print (data)
+							print (page.title())
 							text = raw_input("Save? ")
 							if text == 'y':
 								wd_item.editEntity(data, summary=u'Add commons sitelink from the English Wikipedia')
 								nummodified += 1
-							print nummodified
+							print (nummodified)
 						except:
-							print 'Edit failed'
+							print ('Edit failed')
 
 	if nummodified >= maxnum:
-		print 'Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!'
+		print ('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
 		exit()
 
-print 'Done! Edited ' + str(nummodified) + ' entries'
+print ('Done! Edited ' + str(nummodified) + ' entries')
 		
 # EOF
