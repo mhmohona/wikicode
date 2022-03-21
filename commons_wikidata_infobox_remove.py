@@ -26,21 +26,21 @@ savemessage="Removing Wikidata Infobox as it is included in Finlandyear"
 wikidatainfobox = ["Wikidata Infobox", "Wikidata infobox", "wikidata infobox", "wikidata Infobox", "Infobox Wikidata", "infobox Wikidata", "infobox wikidata", "Infobox wikidata", "Wikidata  infobox", "wikidata  infobox"]
 
 def migratecat(targetcat):
-    print targetcat
+    print (targetcat)
     target_text = targetcat.get()
-    print target_text
+    print (target_text)
     # Check that we have a Wikidata infobox here
     if not any(option in target_text for option in wikidatainfobox):
-        print 'No infobox'
+        print ('No infobox')
         return 0
 
     # Fetch the info from Wikidata
     try:
         wd_item = pywikibot.ItemPage.fromPage(targetcat)
         item_dict = wd_item.get()
-        print wd_item.title()
+        print (wd_item.title())
     except:
-        print 'No Wikidata ID'
+        print ('No Wikidata ID')
         return 0
 
     # Or in the main topic
@@ -102,7 +102,7 @@ def migratecat(targetcat):
     # Time to save it
     if (target_text != targetcat.get()):
         targetcat.text = target_text.strip()
-        print targetcat.text
+        print (targetcat.text)
         if manual:
             text = raw_input("Save on Commons? ")
             if text == '':
@@ -110,7 +110,7 @@ def migratecat(targetcat):
                     targetcat.save(savemessage)
                     return 1
                 except:
-                    print "That didn't work!"
+                    print ("That didn't work!")
                     return 0
             else:
                 return 0
@@ -119,7 +119,7 @@ def migratecat(targetcat):
                 targetcat.save(savemessage)
                 return 1
             except:
-                print "That didn't work!"
+                print ("That didn't work!")
                 return 0
     else:
         return 0
@@ -129,14 +129,14 @@ for i in range(0,len(templates)):
     targetcats = template.embeddedin(namespaces='14')
 
     for targetcat in targetcats:
-        print targetcat
-        print "\n" + targetcat.title()
+        print (targetcat)
+        print ("\n" + targetcat.title())
         nummodified += migratecat(targetcat)
 
         if nummodified >= maxnum:
-            print 'Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!'
+            print ('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
             exit()
 
-    print 'Done! Edited ' + str(nummodified) + ' entries'
+    print ('Done! Edited ' + str(nummodified) + ' entries')
                     
 # EOF
