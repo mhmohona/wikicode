@@ -32,20 +32,20 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 
 def runimport(targetcat):
-    print targetcat.title()
+    print (targetcat.title())
     # Make sure we have a Wikidata entry
     try:
         wd_item = pywikibot.ItemPage.fromPage(targetcat)
         item_dict = wd_item.get()
-        print wd_item.title()
+        print (wd_item.title())
     except:
-        print 'No existing link'
+        print ('No existing link')
         return 0
 
     # Check for P910
     try:
         existing_id = item_dict['claims']['P301']
-        print 'P301 exists, following that.'
+        print ('P301 exists, following that.')
         for clm2 in existing_id:
             wd_item = clm2.getTarget()
             item_dict = wd_item.get()
@@ -63,7 +63,7 @@ def runimport(targetcat):
     # No existing image, add it to the database as a possibility
     mycursor.execute('SELECT * FROM image_candidates WHERE category = "' + targetcat.title() + '"')
     myresult = mycursor.fetchone()
-    print myresult
+    print (myresult)
     if not myresult:
         sql = 'INSERT INTO image_candidates (category, done, decision) VALUES ("' + targetcat.title() + '", 0, 0)'
         mycursor.execute(sql)
@@ -78,7 +78,7 @@ if usetemplate:
     targetcats = template.embeddedin(namespaces='14')
 
     for targetcat in targetcats:
-        print targetcat.title()
+        print (targetcat.title())
         runimport(targetcat)
 elif usecategory:
     targetcats = ['Category:Uses of Wikidata Infobox with no image']
@@ -95,7 +95,7 @@ elif usecategory:
             cat = pywikibot.Category(commons,item)
             nummodified += runimport(cat)
             numchecked += 1
-            print str(nummodified) + " - " + str(numchecked) + "/" + str(len(seen)) + "/" + str(len(active)) + "/" + str(len(next_active))
+            print (str(nummodified) + " - " + str(numchecked) + "/" + str(len(seen)) + "/" + str(len(active)) + "/" + str(len(next_active)))
 
             if i == 1:
                 for result in pagegenerators.SubCategoriesPageGenerator(cat, recurse=False):
@@ -105,18 +105,18 @@ elif usecategory:
 
         active = next_active
         if nummodified >= maxnum:
-            print 'Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!'
+            print ('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
             break
 else:
     # Pick random categories
     while nummodified < maxnum:
         targets = pagegenerators.RandomPageGenerator(total=100, site=commons, namespaces='14')
         for target in targets:
-            print target.title()
+            print (target.title())
             nummodified += runimport(target)
             
             if nummodified >= maxnum:
-                print 'Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!'
+                print ('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
                 break
 
 # EOF
