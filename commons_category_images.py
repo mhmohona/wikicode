@@ -42,10 +42,10 @@ if int(num) > 100:
 lang = GET.get('lang')
 if action == 'desc':
     # print 'desc'
-    print "Content-type: application/json\n\n"
-    print callback + " ( " + json.dumps({'label': {'en':'Images from Commons categories'}, 'description': {'en':'Add images from Commons categories to the linked Wikidata items.'}, 'instructions': {'en':'Please make sure that the image depicts the item! Do not add more than one file per type (e.g., image, coat of arms) per item. Once you have added all approriate files, click "Save - all candidates marked". If in doubt, press "Skip".<br />Bug reports and feedback should be sent to commons:User:Mike Peel.'}, 'icon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/120px-Commons-logo.svg.png'}) + " )\n"
+    print ("Content-type: application/json\n\n")
+    print (callback + " ( " + json.dumps({'label': {'en':'Images from Commons categories'}, 'description': {'en':'Add images from Commons categories to the linked Wikidata items.'}, 'instructions': {'en':'Please make sure that the image depicts the item! Do not add more than one file per type (e.g., image, coat of arms) per item. Once you have added all approriate files, click "Save - all candidates marked". If in doubt, press "Skip".<br />Bug reports and feedback should be sent to commons:User:Mike Peel.'}, 'icon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/120px-Commons-logo.svg.png'}) + " )\n")
 elif action == 'tiles':
-    print "Content-type: application/json\n\n"
+    print ("Content-type: application/json\n\n")
     i = 0
     finished = 0
     tiles = []
@@ -117,32 +117,32 @@ elif action == 'tiles':
             if i >= int(num):
                 finished = 1
     # print json.dumps({"tiles":tiles})
-    print callback + " ( " + json.dumps(tiles) + ")\n"
+    print (callback + " ( " + json.dumps(tiles) + ")\n")
 elif action == 'log_action':
-    print "Content-type: text/html\n\n"
+    print ("Content-type: text/html\n\n")
     user = GET.get('user')
     tile = GET.get('tile')
     decision = GET.get('decision')
-    print decision
+    print (decision)
     # decision = 0 not set, 1 irrelevant, 2 no, 3 yes
     if decision == "no":
-        print int(tile)
-        print user
-        print decision
+        print (int(tile))
+        print (user)
+        print (decision)
         sql = 'UPDATE image_candidates SET done = 1, user = "'+user+'", decision = 2 WHERE iid = "' + tile + '"'
         # print sql
         mycursor.execute(sql)
         mydb.commit()
-        print "no"
+        print ("no")
     elif decision == "yes":
         sql = 'UPDATE image_candidates SET done = 1, user = "'+user+'", decision = 3 WHERE iid = "' + tile + '"'
         mycursor.execute(sql)
         mydb.commit()
-        print "yes"
+        print ("yes")
 else:
-    print "Content-type: text/html\n\n"
-    print 'Incorrect action!'
-    print args
+    print ("Content-type: text/html\n\n")
+    print ('Incorrect action!')
+    print (args)
     
 # mycursor.close()
 # mydb.close()
