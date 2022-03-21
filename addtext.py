@@ -22,14 +22,14 @@ def addtext(site, project, toedit, text, othertext='',rate=10, trialrun=0):
 
     for item in toedit:
         item = item.decode('utf-8').strip()
-        print item
+        print (item)
         page = pywikibot.Page(site, item)
         if page.text == '':
-            print "Error - page is empty!"
+            print ("Error - page is empty!")
         elif text not in page.text:
             if (othertext == '') or (othertext not in page.text):
                 if trialrun:
-                    print ' - To edit'
+                    print (' - To edit')
                 else:
                     page.text = page.text + "\n" + text
                     page.save(u"Adding " + text)
