@@ -28,40 +28,40 @@ mydb = mysql.connector.connect(
 )
 mycursor = mydb.cursor()
 
-print "Content-type: text/html\n\n"
+print ("Content-type: text/html\n\n")
 
 mycursor.execute('SELECT decision, count(*) as NUM FROM candidates GROUP BY decision ORDER BY NUM DESC')
 myresult = mycursor.fetchall()
-print '<table style="border:1px solid black;">'
+print ('<table style="border:1px solid black;">')
 total = 0
 for val in myresult:
-	print "<tr><td>"
+	print ("<tr><td>")
 	if val[0] == 0:
-		print "Not done yet"
+		print ("Not done yet")
 	elif val[0] == 1:
-		print "No longer relevant"
+		print ("No longer relevant")
 	elif val[0] == 2:
-		print "No"
+		print ("No")
 	elif val[0] == 3:
-		print "Yes"
+		print ("Yes")
 	else:
-		print str(val[0])
-	print "</td><td>" + str(val[1]) + "</td></tr>"
+		print (str(val[0]))
+	print ("</td><td>" + str(val[1]) + "</td></tr>")
 	total += int(val[1])
-print "<tr><td>Total</td><td>" + str(total) + "</td></tr>"
-print "</table>"
+print ("<tr><td>Total</td><td>" + str(total) + "</td></tr>")
+print ("</table>")
 
 
 mycursor.execute('SELECT user, count(*) as NUM FROM candidates GROUP BY user ORDER BY NUM DESC')
 myresult = mycursor.fetchall()
-print '<table style="border:1px solid black;">'
+print ('<table style="border:1px solid black;">')
 for val in myresult:
-	print "<tr><td>"
+	print ("<tr><td>")
 	if val[0] == "NA":
-		print "(Done outside of game)"
+		print ("(Done outside of game)")
 	elif val[0] == "":
-		print "Not done yet"
+		print ("Not done yet")
 	else:
-		print str(val[0])
-	print "</td><td>" + str(val[1]) + "</td></tr>"
-print "</table>"
+		print (str(val[0]))
+	print ("</td><td>" + str(val[1]) + "</td></tr>")
+print ("</table>")
