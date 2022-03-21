@@ -30,7 +30,7 @@ for regex in regexes:
         if page in pageschecked:
             continue
 
-        print page
+        print (page)
         pageschecked.append(page)
         i += 1
         try:
@@ -38,7 +38,7 @@ for regex in regexes:
         except:
             continue
         pmids = re.findall(r'\|\s*?pmid\s*?\=\s*?(\d+?)\s*?\|', text)
-        print len(pmids)
+        print (len(pmids))
         for pmid in pmids:
             if "* " + str(pmid) + " -" not in checkedpages:
                 checkedpages.append("* " + str(pmid) + " - [[" + page.title() + "]]")
@@ -47,16 +47,16 @@ for regex in regexes:
                 checkedpages[index] += ", [[" + page.title() + "]]"
 
         if len(checkedpages) > maxnum:
-            print 'Reached the maximum of ' + str(maxnum) + ' pages loaded, saving!'
+            print ('Reached the maximum of ' + str(maxnum) + ' pages loaded, saving!')
             break
     if len(checkedpages) > maxnum:
-        print 'Reached the maximum of ' + str(maxnum) + ' pages loaded, saving!'
+        print ('Reached the maximum of ' + str(maxnum) + ' pages loaded, saving!')
         break
             
-print str(i) + " pages checked, " + str(len(checkedpages)) + " recorded!"
+print (str(i) + " pages checked, " + str(len(checkedpages)) + " recorded!")
 checkedpages.sort()
 for i in range(0,len(checkedpages)):
     reporttext += checkedpages[i] + "\n"
 report.text = reporttext
-print reporttext
+print (reporttext)
 report.save('Update')
