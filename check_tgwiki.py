@@ -40,11 +40,11 @@ def update_report(qid, tgwp, empty=False):
     try:
         report.save('Update report to include ' + qid)
     except:
-        print 'Could not save report!'
+        print ('Could not save report!')
     return
 
 for i in range(0,numsteps):
-    print 'Starting at ' + str(i*stepsize)
+    print ('Starting at ' + str(i*stepsize))
 
     query = 'SELECT ?item ?itemLabel ?article\n'\
     'WHERE\n'\
@@ -54,7 +54,7 @@ for i in range(0,numsteps):
     '    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],tg" }\n'\
     '}\n'\
     'LIMIT ' + str(stepsize) + ' OFFSET ' + str(i*stepsize)
-    print query
+    print (query)
     # exit()
     i = 0
     generator = pagegenerators.WikidataSPARQLPageGenerator(query, site=wikidata_site)
@@ -63,32 +63,32 @@ for i in range(0,numsteps):
             item_dict = page.get()
             qid = page.title()
         except:
-            print 'Huh - no page found'
+            print ('Huh - no page found')
             continue
-        print "\n" + qid
+        print ("\n" + qid)
         try:
             tgwp = get_sitelink_title(item_dict['sitelinks']['tgwiki'])
-            print tgwp
+            print (tgwp)
         except:
-            print 'tgwiki sitelink not found!'
+            print ('tgwiki sitelink not found!')
             continue
 
-        print tgwp.decode('utf-8')
+        print (tgwp.decode('utf-8'))
 
         url = u'https://tg.wikipedia.org/wiki/'+tgwp.replace(' ','_')
         url = urllib.quote(url.encode('utf8'), ':/')
-        print url
+        print (url)
         #tgwp.decode('unicode-escape').encode('utf-8') #.decode('unicode_escape')#.encode('utf8')
         #url = urllib.quote(url, safe="%/:=&?~#+!$,;'@()*[]")
 
         a=urllib.urlopen(url)
         code = a.getcode()
-        print code
+        print (code)
         if code == 404:
             page.removeSitelink(site='tgwiki', summary=u'Removing broken sitelink to tgwiki')
             item_dict = page.get()
-            print item_dict['sitelinks']
-            print len(item_dict['sitelinks'])
+            print (item_dict['sitelinks'])
+            print (len(item_dict['sitelinks']))
             if len(item_dict['sitelinks']) == 0:
                 update_report(qid, tgwp, empty=True)
             else:
