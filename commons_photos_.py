@@ -20,8 +20,7 @@ import unicodedata
 photolist = []
 with open("commons_photos.txt", mode='r',encoding='utf8') as infile:
     reader = csv.reader(infile)
-    for rows in reader:
-	    photolist.append(rows[0])
+    photolist.extend(rows[0] for rows in reader)
 # print photolist
 # print len(photolist)
 # exit()

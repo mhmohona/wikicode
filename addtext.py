@@ -32,4 +32,4 @@ def addtext(site, project, toedit, text, othertext='',rate=10, trialrun=0):
                     print (' - To edit')
                 else:
                     page.text = page.text + "\n" + text
-                    page.save(u"Adding " + text)
+                    page.save(f"Adding {text}")

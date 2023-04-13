@@ -34,21 +34,21 @@ def addcat(page, newcat):
 				return 0
 
 		if newcat not in page.text:
-			page.text = page.text + "\n[[" + newcat + "]]"
-			input('Would save!')
-			page.save(u"Adding [[:" + newcat + "]]")
-			return 1
+				page.text = page.text + "\n[[" + newcat + "]]"
+				input('Would save!')
+				page.save(f"Adding [[:{newcat}]]")
+				return 1
 		else:
-			print("Already in category")
-			return 0
+				print("Already in category")
+				return 0
 
 cat = pywikibot.Category(site, targetcat)
 pages = pagegenerators.CategorizedPageGenerator(cat, recurse=False);
 for page in pages:
-	print(page.title())
-	nummodified += addcat(page, newcat)
+		print(page.title())
+		nummodified += addcat(page, newcat)
 
-	print(nummodified)
-	if nummodified >= maxnum:
-		print("Reached the maximum of " + str(maxnum) + " entries modified, quitting!")
-		exit()
+		print(nummodified)
+		if nummodified >= maxnum:
+				print(f"Reached the maximum of {str(maxnum)} entries modified, quitting!")
+				exit()

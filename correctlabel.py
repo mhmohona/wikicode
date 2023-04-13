@@ -11,7 +11,7 @@ repo = wikidata_site.data_repository()
 lang = 'lb'
 string = 'chemesch Verbindung'
 replacement = 'cheemesch Verbindung'
-savemessage = 'Change ' + lang + ' label to '
+savemessage = f'Change {lang} label to '
 debug = False
 query = 'SELECT '\
 '	?search '\

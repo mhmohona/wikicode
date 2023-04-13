@@ -32,12 +32,12 @@ def newitem(category, items):
 
 	for item in items:
 		claim = pywikibot.Claim(repo, item[0])
-		if item[0] == 'P569' or item[0] == 'P570':
+		if item[0] in ['P569', 'P570']:
 			claim.setTarget(item[1])
 		else:
 			claim.setTarget(pywikibot.ItemPage(repo, item[1]))
 		try:
-			candidate_item.addClaim(claim, summary=u'Setting '+item[0]+' value')
+			candidate_item.addClaim(claim, summary=f'Setting {item[0]} value')
 			claim.addSources([statedin, retrieved], summary=u'Add source.')
 		except:
 			print("That didn't work")
@@ -76,7 +76,7 @@ def do_check(page,create=True, search=True):
 		wd_item = pywikibot.ItemPage.fromPage(page)
 		item_dict = wd_item.get()
 		qid = wd_item.title()
-		print("Has a sitelink already - https://www.wikidata.org/wiki/" + qid)
+		print(f"Has a sitelink already - https://www.wikidata.org/wiki/{qid}")
 		# If we have a P910 value, switch to using that item
 		try:
 			existing_id = item_dict['claims']['P301']
@@ -110,7 +110,7 @@ def do_check(page,create=True, search=True):
 			print('Has coord')
 		except:
 			hascoord = False
-		if iscat==False and hascoord==False and ishuman==False:
+		if not iscat and not hascoord and not ishuman:
 			input('Add coordinate?')
 		test = 'n'
 		if '{{Wikidata Infobox}}' not in page.text:
@@ -120,12 +120,12 @@ def do_check(page,create=True, search=True):
 				page.save('Add {{Wikidata Infobox}}')
 		return 0
 	except:
-		print(page.title() + ' - no page found')
+		print(f'{page.title()} - no page found')
 		wd_item = 0
 		item_dict = 0
 		qid = 0
 		sitelink_check = 0
-		# continue
+			# continue
 
 	if search:
 		print('Searching for a match...')
@@ -133,7 +133,7 @@ def do_check(page,create=True, search=True):
 		if wikidataEntries['search'] != []:
 			results = wikidataEntries['search']
 			numresults = len(results)
-			for i in range(0,numresults):
+			for i in range(numresults):
 				targetpage = pywikibot.ItemPage(wikidata_site, results[i]['id'])
 				item_dict = targetpage.get()
 				print('http://www.wikidata.org/wiki/'+results[i]['id'])
@@ -151,7 +151,7 @@ def do_check(page,create=True, search=True):
 		if wikidataEntries['search'] != []:
 			results = wikidataEntries['search']
 			numresults = len(results)
-			for i in range(0,numresults):
+			for i in range(numresults):
 				targetpage = pywikibot.ItemPage(wikidata_site, results[i]['id'])
 				item_dict = targetpage.get()
 				print('http://www.wikidata.org/wiki/'+results[i]['id'])
@@ -203,7 +203,9 @@ if targetcats != []:
 			cat = pywikibot.Category(commons,item)
 			nummodified += do_check(cat,create,search)
 			numchecked += 1
-			print(str(nummodified) + " - " + str(numchecked) + "/" + str(len(seen)) + "/" + str(len(active)) + "/" + str(len(next_active)))
+			print(
+				f"{str(nummodified)} - {numchecked}/{len(seen)}/{len(active)}/{len(next_active)}"
+			)
 
 			# See if there are subcategories that we want to check in the future
 			for result in pagegenerators.SubCategoriesPageGenerator(cat, recurse=False):
@@ -214,7 +216,7 @@ if targetcats != []:
 		random.shuffle(temp)
 		active = set(temp)
 		if nummodified >= maxnum:
-			print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
+			print(f'Reached the maximum of {str(maxnum)} entries modified, quitting!')
 			break
 else:
 	while nummodified < maxnum:
@@ -225,7 +227,7 @@ else:
 			print(nummodified)
 
 			if nummodified >= maxnum:
-				print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
+				print(f'Reached the maximum of {str(maxnum)} entries modified, quitting!')
 				break
 
 # EOF

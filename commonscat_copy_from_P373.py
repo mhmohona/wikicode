@@ -17,7 +17,7 @@ maxnum = 100000
 nummodified = 0
 stepsize =  1000
 maximum = 6000000
-numsteps = int(maximum / stepsize)
+numsteps = maximum // stepsize
 
 catredirect_templates = ["category redirect", "Category redirect", "seecat", "Seecat", "see cat", "See cat", "categoryredirect", "Categoryredirect", "catredirect", "Catredirect", "cat redirect", "Cat redirect", "catredir", "Catredir", "redirect category", "Redirect category", "cat-red", "Cat-red", "redirect cat", "Redirect cat", "category Redirect", "Category Redirect", "cat-redirect", "Cat-redirect"]
 
@@ -26,8 +26,8 @@ wikidata_site = pywikibot.Site("wikidata", "wikidata")
 repo = wikidata_site.data_repository()
 commons = pywikibot.Site('commons', 'commons')
 debug = 1
-for i in range(0,numsteps):
-	print('Starting at ' + str(i*stepsize))
+for i in range(numsteps):
+	print(f'Starting at {str(i * stepsize)}')
 
 	query = 'SELECT ?item\n'\
 	'WITH {\n'\
@@ -50,11 +50,11 @@ for i in range(0,numsteps):
 	'    OPTIONAL {\n'\
 	'        ?item2 wdt:P373 ?commonscat .\n'\
 	'    }\n'\
-   '    FILTER NOT EXISTS {\n'\
-   '        ?item3 wdt:P373 ?commonscat .\n'\
-   '        FILTER (?item3 != ?item) .\n'\
-   '        FILTER (!(bound(?item2) && ?item3 = ?item2))\n'\
-   '    }\n'\
+	'    FILTER NOT EXISTS {\n'\
+	'        ?item3 wdt:P373 ?commonscat .\n'\
+	'        FILTER (?item3 != ?item) .\n'\
+	'        FILTER (!(bound(?item2) && ?item3 = ?item2))\n'\
+	'    }\n'\
 	'    MINUS {?commonslink schema:about ?item . ?commonslink schema:isPartOf <https://commons.wikimedia.org/> . } \n'\
 	'}'
 	# '    MINUS {?item wdt:P910 [] }\n'\
@@ -80,10 +80,7 @@ for i in range(0,numsteps):
 			except:
 				print('Huh - no P373 found')
 				continue
-			p373_check = 0
-			for clm in p373:
-				p373_check += 1
-
+			p373_check = sum(1 for _ in p373)
 			# If we have a P910 value, switch to using that item
 			try:
 				existing_id = item_dict['claims']['P910']
@@ -107,7 +104,7 @@ for i in range(0,numsteps):
 				for clm in p373:
 					val = clm.getTarget()
 					val = clm.getTarget()
-					commonscat = u"Category:" + val
+					commonscat = f"Category:{val}"
 					try:
 						targetpage = pywikibot.Page(commons, commonscat)
 					except:
@@ -140,7 +137,7 @@ for i in range(0,numsteps):
 			if p373_check == 1 and sitelink_check == 0:
 				for clm in p373:
 					val = clm.getTarget()
-					commonscat = u"Category:" + val
+					commonscat = f"Category:{val}"
 					# The commons category must already exist
 					try:
 						sitelink_page = pywikibot.Page(commons, commonscat)
@@ -156,7 +153,7 @@ for i in range(0,numsteps):
 						except:
 
 							# That didn't work, add it to the Wikidata entry
-							data = {'sitelinks': [{'site': 'commonswiki', 'title': u"Category:" + val}]}
+							data = {'sitelinks': [{'site': 'commonswiki', 'title': f"Category:{val}"}]}
 							try:
 								# print val
 								# text = raw_input("Save? ")
@@ -168,11 +165,11 @@ for i in range(0,numsteps):
 								print('Edit failed')
 
 					if nummodified >= maxnum:
-						print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
+						print(f'Reached the maximum of {maxnum} entries modified, quitting!')
 						exit()
 	except:
 		continue
 
-print('Done! Edited ' + str(nummodified) + ' entries')
+print(f'Done! Edited {str(nummodified)} entries')
 
 # EOF

@@ -30,7 +30,7 @@ def migratecat(targetcat):
     target_text = targetcat.get()
     print(target_text)
     # Check that we have a Wikidata infobox here
-    if not any(option in target_text for option in wikidatainfobox):
+    if all(option not in target_text for option in wikidatainfobox):
         print('No infobox')
         return 0
 
@@ -55,7 +55,7 @@ def migratecat(targetcat):
         null = 1
 
     # Remove other templates
-    for i in range(0,len(others)):
+    for i in range(len(others)):
         target_text = target_text.replace("{{"+others[i]+"}}", "")
         if wd_item != 0:
             target_text = target_text.replace("{{" + others[i] + "|" + wd_item.title() + "}}", "")
@@ -79,13 +79,13 @@ def migratecat(targetcat):
     try:
         enwp_link = get_sitelink_title(item_dict['sitelinks']['enwiki'])
         enwp_link2 = enwp_link[0].lower() + enwp_link[1:]
-        for i in range(0,len(enwp)):
+        for i in range(len(enwp)):
             target_text = target_text.replace("{{"+enwp[i]+"|"+enwp_link+"}}", "")
             target_text = target_text.replace("{{"+enwp[i]+"|"+enwp_link2+"}}", "")
     except:
         null = 1
 
-    for i in range(0,len(wikidatainfobox)):
+    for i in range(len(wikidatainfobox)):
         if wd_item != 0:
             target_text = target_text.replace("{{"+wikidatainfobox[i]+"|"+wd_item.title(),'{{Wikidata Infobox')
             target_text = target_text.replace("{{"+wikidatainfobox[i]+"|qid="+wd_item.title(),'{{Wikidata Infobox')
@@ -120,13 +120,11 @@ def migratecat(targetcat):
     lines = target_text.splitlines()
     insertline = 0
     i = 0
-    j = 0
-    for line in lines:
+    for j, line in enumerate(lines):
         if '{{Wikidata Infobox}}' in line:
             i += 1
             if i != 1:
                 lines[j] = lines[j].replace('{{Wikidata Infobox}}', '')
-        j += 1
     target_text = "\n".join(lines)
 
     # Only remove whitespace if we're making another change
@@ -136,34 +134,24 @@ def migratecat(targetcat):
         target_text = target_text.replace('\n\n{{Wikidata Infobox','\n{{Wikidata Infobox')
         # target_text = target_text.replace('\n\n','\n')
 
-    # Time to save it
-    if (target_text != targetcat.get()):
-        targetcat.text = target_text.strip()
-        print(targetcat.text)
-        if manual:
-            text = input("Save on Commons? ")
-            if text == '':
-                try:
-                    targetcat.save(savemessage)
-                    return 1
-                except:
-                    print("That didn't work!")
-                    return 0
-            else:
-                return 0
-        else:
-            try:
-                targetcat.save(savemessage)
-                return 1
-            except:
-                print("That didn't work!")
-                return 0
-    else:
+    if target_text == targetcat.get():
+        return 0
+    targetcat.text = target_text.strip()
+    print(targetcat.text)
+    if manual:
+        text = input("Save on Commons? ")
+        if text != '':
+            return 0
+    try:
+        targetcat.save(savemessage)
+        return 1
+    except:
+        print("That didn't work!")
         return 0
 
 # Check for uses of the Wikidata Infobox redirects
-for i in range(0,len(templates)):
-    template = pywikibot.Page(commons, 'Template:'+templates[i])
+for i in range(len(templates)):
+    template = pywikibot.Page(commons, f'Template:{templates[i]}')
     targetcats = template.embeddedin(namespaces='14')
     for targetcat in targetcats:
         print(targetcat)
@@ -171,7 +159,7 @@ for i in range(0,len(templates)):
         nummodified += migratecat(targetcat)
 
         if nummodified >= maxnum:
-            print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
+            print(f'Reached the maximum of {str(maxnum)} entries modified, quitting!')
             exit()
 
 # Check through the manual ID category
@@ -186,7 +174,7 @@ for targetcat in targetcats:
     nummodified += migratecat(targetcat)
 
     if nummodified >= maxnum:
-        print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
+        print(f'Reached the maximum of {str(maxnum)} entries modified, quitting!')
         exit()
 
 # Categories
@@ -197,10 +185,10 @@ for targetcat in targetcats:
     nummodified += migratecat(targetcat)
 
     if nummodified >= maxnum:
-        print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
+        print(f'Reached the maximum of {str(maxnum)} entries modified, quitting!')
         exit()
 
 
-print('Done! Edited ' + str(nummodified) + ' entries')
+print(f'Done! Edited {str(nummodified)} entries')
 
 # EOF

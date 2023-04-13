@@ -27,12 +27,12 @@ languages = ['en','de','fr','es','pt','it','nl','pl','ru']
 for language in languages:
 	enwiki = pywikibot.Site(language, 'wikipedia')
 
-	regex = 'insource:/"[['+language+'"/'
+	regex = f'insource:/"[[{language}"/'
 	generator = pagegenerators.SearchPageGenerator(regex, site=commons, namespaces=[14])
 	gen = pagegenerators.PreloadingGenerator(generator)
 	count = 0
 	for category in gen:
-		print(str(count) + ' - ' + category.title())
+		print(f'{str(count)} - {category.title()}')
 		count += 1
 
 		try:
@@ -49,8 +49,8 @@ for language in languages:
 		for iw in category.interwiki():
 			try:
 				print(iw)
-				if 'wikipedia:'+language in str(iw):
-					enwp = str(iw).replace('[[wikipedia:'+language+':','').replace(']]','')
+				if f'wikipedia:{language}' in str(iw):
+					enwp = str(iw).replace(f'[[wikipedia:{language}:', '').replace(']]', '')
 			except:
 				continue
 		if enwp == '':
@@ -82,7 +82,7 @@ for language in languages:
 			# prettyPrint(item_dict)
 			# print(data)
 			print('https://commons.wikimedia.org/wiki/'+category.title().replace(' ','_'))
-			print('https://www.wikidata.org/wiki/'+str(wd_item.title()))
+			print(f'https://www.wikidata.org/wiki/{str(wd_item.title())}')
 			try:
 				# text = input("Save? ")
 				# if text == 'y':

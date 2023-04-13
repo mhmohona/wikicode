@@ -20,7 +20,7 @@ sys.setdefaultencoding('utf-8')
 
 stepsize =  1000
 maximum = 10000000
-numsteps = int(maximum / stepsize)
+numsteps = maximum // stepsize
 
 wikidata_site = pywikibot.Site("wikidata", "wikidata")
 repo = wikidata_site.data_repository()  # this is a DataSite object
@@ -38,13 +38,13 @@ def update_report(qid, tgwp, empty=False):
         return
     report.text = report_text + rep
     try:
-        report.save('Update report to include ' + qid)
+        report.save(f'Update report to include {qid}')
     except:
         print ('Could not save report!')
     return
 
-for i in range(0,numsteps):
-    print ('Starting at ' + str(i*stepsize))
+for i in range(numsteps):
+    print(f'Starting at {str(i * stepsize)}')
 
     query = 'SELECT ?item ?itemLabel ?article\n'\
     'WHERE\n'\

@@ -16,7 +16,7 @@ def update_report(page, old_pmid, new_pmid, ):
     if rep in report_text:
         return
     report.text = report_text + rep + u' - ~~~~~'
-    report.save('Update report to include ' + page.title())
+    report.save(f'Update report to include {page.title()}')
 
 checkedpages = {}
 reportpage = 'Wikipedia:WikiProject_Medicine/Cochrane_update'
@@ -27,16 +27,14 @@ site = pywikibot.Site('en', 'wikipedia')
 report = pywikibot.Page(site, reportpage)
 report_text = report.get()
 report_text = report_text.splitlines()
-archive = pywikibot.Page(site, reportpage+"/Archive_1")
+archive = pywikibot.Page(site, f"{reportpage}/Archive_1")
 archive_text = archive.get()
 report_text_new = ''
 # print(report_text)
 for line in report_text:
     print(line)
     # exit()
-    if "{{done}}" in line:
-        archive_text = archive_text + "\n" + line
-    elif "{{Done}}" in line:
+    if "{{done}}" in line or "{{Done}}" in line:
         archive_text = archive_text + "\n" + line
     else:
         report_text_new = report_text_new + "\n" + line
@@ -75,9 +73,9 @@ for regex in regexes:
         for pmid in pmids:
             # pmid = '27093058'
             if str(pmid) not in checkedpages:
-                print('https://pubmed.ncbi.nlm.nih.gov/%s' % pmid)
+                print(f'https://pubmed.ncbi.nlm.nih.gov/{pmid}')
                 try:
-                    r = requests.get('https://pubmed.ncbi.nlm.nih.gov/%s' % pmid, timeout=10.0)
+                    r = requests.get(f'https://pubmed.ncbi.nlm.nih.gov/{pmid}', timeout=10.0)
                     res = r.text
                 except:
                     continue
@@ -90,7 +88,7 @@ for regex in regexes:
                     checkedpages[str(pmid)] = pm
                     # Check to make sure that the new paper doesn't also have an updated version...
                     try:
-                        r2 = requests.get('https://pubmed.ncbi.nlm.nih.gov/%s' % pm, timeout=10.0)
+                        r2 = requests.get(f'https://pubmed.ncbi.nlm.nih.gov/{pm}', timeout=10.0)
                         res2 = r2.text
                     except:
                         continue
@@ -101,34 +99,32 @@ for regex in regexes:
                     if 'WITHDRAWN' in res2 and re.search(r'data-ga-category="comment_correction"data-ga-action="(\d+?)"data-ga-label="linked-update">', rawtext2):
                         pm2 = re.findall(r'data-ga-category="comment_correction"data-ga-action="(\d+?)"data-ga-label="linked-update">', rawtext2)[0]
                         try:
-                            r3 = requests.get('https://pubmed.ncbi.nlm.nih.gov/%s' % pm2, timeout=10.0)
+                            r3 = requests.get(f'https://pubmed.ncbi.nlm.nih.gov/{pm2}', timeout=10.0)
                             res3 = r3.text
-                            if '<title>WITHDRAWN' in res3:
-                                # This new one has also been withdrawn, giving up.
-                                checkedpages[str(pmid)] = 0
-                            else:
-                                checkedpages[str(pmid)] = pm2
+                            checkedpages[str(pmid)] = 0 if '<title>WITHDRAWN' in res3 else pm2
                         except:
                             continue
                 else:
                     checkedpages[str(pmid)] = 0
             else:
-                print('using cache for ' + str(pmid))
+                print(f'using cache for {str(pmid)}')
             print(checkedpages[str(pmid)])
-            if checkedpages[str(pmid)] != 0:
-                if '<!-- No update needed: ' + str(pmid) + ' -->' not in text:
-                    up = u'{{Update inline|reason=Updated version https://www.ncbi.nlm.nih.gov/pubmed/' + checkedpages[str(pmid)]
-                    if not up in text:
-                        text = re.sub(r'(\|\s*?pmid\s*?\=\s*?%s\s*?(?:\||\}\}).*?\< *?\/ *?ref *?\>)' % pmid,r'\1%s}}' % (up+str(datestr)), text, re.DOTALL)
-                        print('Would update report')
-                        if debug == False:
-                            update_report(page, pmid, checkedpages[str(pmid)])
+            if (
+                checkedpages[str(pmid)] != 0
+                and f'<!-- No update needed: {str(pmid)} -->' not in text
+            ):
+                up = u'{{Update inline|reason=Updated version https://www.ncbi.nlm.nih.gov/pubmed/' + checkedpages[str(pmid)]
+                if up not in text:
+                    text = re.sub(r'(\|\s*?pmid\s*?\=\s*?%s\s*?(?:\||\}\}).*?\< *?\/ *?ref *?\>)' % pmid,r'\1%s}}' % (up+str(datestr)), text, re.DOTALL)
+                    print('Would update report')
+                    if debug == False:
+                        update_report(page, pmid, checkedpages[str(pmid)])
         if text != page.text and debug == False:
             page.text = text
             page.save(u'Adding "update inline" template for Cochrane reference')
             nummodified += 1
             if nummodified > maxnum - 1:
-                print('Reached the maximum of ' + str(maxnum) + ' pages modified, quitting!')
+                print(f'Reached the maximum of {str(maxnum)} pages modified, quitting!')
                 exit()
 
-print(str(i) + " pages checked, " + str(nummodified) + " tagged!")
+print(f"{str(i)} pages checked, {str(nummodified)} tagged!")

@@ -41,7 +41,7 @@ for page in pages:
 	print("")
 	print(nummodified)
 	if nummodified >= maxnum:
-		print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
+		print(f'Reached the maximum of {maxnum} entries modified, quitting!')
 		exit()
 
 	# Get the Wikidata item
@@ -51,7 +51,7 @@ for page in pages:
 		qid = wd_item.title()
 	except:
 		# If that didn't work, go no further
-		print(page.title() + ' - no page found')
+		print(f'{page.title()} - no page found')
 		continue
 
 	print("\n" + qid)
@@ -77,16 +77,16 @@ for page in pages:
 		continue
 
 	# We don't. Let's add it!
-	for i in range(0,len(templates)):
+	for template in templates:
 		try:
-			target_text = target_text.replace(templates[i], templates[i]+'|wikidata='+qid)
+			target_text = target_text.replace(template, f'{template}|wikidata={qid}')
 		except:
 			null = 1
 
 	if page.get() != target_text:
 		page.text = target_text
 		test = 'y'
-		savemessage = "Add the category's Wikidata ID (" + qid + ") to the authority control template"
+		savemessage = f"Add the category's Wikidata ID ({qid}) to the authority control template"
 		if debug == 1:
 			test = 'n'
 			print(target_text)
@@ -99,6 +99,6 @@ for page in pages:
 			page.save(savemessage)
 			continue
 
-print('Done! Edited ' + str(nummodified) + ' entries')
+print(f'Done! Edited {str(nummodified)} entries')
 		
 # EOF

@@ -37,7 +37,7 @@ def newitem(category, items,cat=True):
 		else:
 			claim.setTarget(pywikibot.ItemPage(repo, item[1]))
 		try:
-			candidate_item.addClaim(claim, summary=u'Setting '+item[0]+' value')
+			candidate_item.addClaim(claim, summary=f'Setting {item[0]} value')
 		except:
 			print("That didn't work")
 	return candidate_item
@@ -83,9 +83,7 @@ for targetcat in targetcats:
 		null = 1
 
 	# Start assembling the Wikdata entry
-	items = [['P31','Q4167836']] # Instance of Wikimedia category
-	items.append(['P301',id_val]) # Main topic
-
+	items = [['P31', 'Q4167836'], ['P301', id_val]]
 	print(items)
 	test = input('Create new category item?')
 	if test == 'y':

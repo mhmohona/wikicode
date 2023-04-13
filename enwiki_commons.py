@@ -22,13 +22,12 @@ templates = ['Commons','Common','Wikicommons','Wikicommon']
 
 catredirect_templates = ["category redirect", "Category redirect", "seecat", "Seecat", "see cat", "See cat", "categoryredirect", "Categoryredirect", "catredirect", "Catredirect", "cat redirect", "Cat redirect", "catredir", "Catredir", "redirect category", "Redirect category", "cat-red", "Cat-red", "redirect cat", "Redirect cat", "category Redirect", "Category Redirect", "cat-redirect", "Cat-redirect"]
 
-template = pywikibot.Page(enwp, 'Template:'+templates[0])
+template = pywikibot.Page(enwp, f'Template:{templates[0]}')
 targetcats = template.embeddedin(namespaces='14')
 # targetcats = template.embeddedin(namespaces='0')
 
 
 for page in targetcats:
-	# Optional skip-ahead to resume broken runs
 	if trip == 0:
 		if "Zizia" in page.title():
 			trip = 1
@@ -46,22 +45,22 @@ for page in targetcats:
 	id_val = 0
 	abort = 0
 	commonscat_string = ""
-	for i in range(0,len(templates)):
-		if "{{"+templates[i]+"}}" in target_text:
+	for template_ in templates:
+		if "{{" + template_ + "}}" in target_text:
 			id_val = ''
-			id_template = templates[i]
-			id_string = "{{"+templates[i]+"}}"
+			id_template = template_
+			id_string = "{{" + template_ + "}}"
 		try:
-			print(templates[i])
-			value = (target_text.split("{{"+templates[i]))[1].split("}}")[0]
+			print(template_)
+			value = target_text.split("{{" + template_)[1].split("}}")[0]
 			if value and id_val == 0:
 				id_val = value
-				id_template = templates[i]
-				id_string = "{{"+templates[i]+id_val+"}}"
+				id_template = template_
+				id_string = "{{" + template_ + id_val + "}}"
 		except:
 			null = 1
 		try:
-			template = templates[i][0].lower() + templates[i][1:]
+			template = template_[0].lower() + template_[1:]
 			# print(template)
 			value = (target_text.split("{{"+template))[1].split("}}")[0]
 			if value and id_val == 0:
@@ -83,7 +82,7 @@ for page in targetcats:
 
 	# Do some tidying of the link
 	bad_id = np.zeros(len(id_vals))
-	for i in range(0,len(id_vals)):
+	for i in range(len(id_vals)):
 		if 'position' in id_vals[i] or 'bullet' in id_vals[i] or 'nowrap' in id_vals[i] or 'lcfirst' in id_vals[i] or 'lcf' in id_vals[i] or 'align' in id_vals[i] or 'width' in id_vals[i] or id_vals[i] == '' or id_vals[i] == ' ':
 			bad_id[i] = 1
 	id_vals = np.asarray(id_vals,dtype="str")
@@ -102,12 +101,12 @@ for page in targetcats:
 		print(qid)
 	except:
 		# If that didn't work, go no further
-		print(page.title() + ' - no page found')
+		print(f'{page.title()} - no page found')
 		wd_item = 0
 		item_dict = 0
 		qid = 0
 		sitelink_check = 0
-		# continue
+			# continue
 
 	# If we have a P910 value, switch to using that Wikidata item
 	if qid != 0:
@@ -129,7 +128,7 @@ for page in targetcats:
 		except:
 			sitelink = ''
 			sitelink_check = 0
-		print("sitelink: " + str(sitelink))
+		print(f"sitelink: {sitelink}")
 
 	for val in id_vals:
 		if 'Category' in val:
@@ -160,6 +159,6 @@ for page in targetcats:
 
 	# input('Next?')
 
-print('Done! Edited ' + str(nummodified) + ' entries')
+print(f'Done! Edited {str(nummodified)} entries')
 
 # EOF

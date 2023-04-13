@@ -75,9 +75,12 @@ for targetcat in targetcats:
 					# if text == 'y':
 					print('Saving!')
 					try:
-						cat_item.editEntity(data, summary=u'Moving commons category sitelink from main item item (' + str(targetcat[0].title()) + ') - fix incomplete move due to lag')
+						cat_item.editEntity(
+							data,
+							summary=f'Moving commons category sitelink from main item item ({str(targetcat[0].title())}) - fix incomplete move due to lag',
+						)
 					except:
-						print('Problem with ' + str(qid) + ' from ' + str(targetcat[0].title()))
+						print(f'Problem with {str(qid)} from {str(targetcat[0].title())}')
 						exit()
 						
 

@@ -35,154 +35,154 @@ def search_entities(site, itemtitle):
 	 return request.submit()
 
 def do_date_find(page):
-	print(page.title())
-	# See if we have a Wikidata item already
-	try:
-		wd_item = pywikibot.ItemPage.fromPage(page)
-		item_dict = wd_item.get()
-		qid = wd_item.title()
-		print("Has a sitelink already - https://www.wikidata.org/wiki/" + qid)
-		return 0
-	except:
-		wd_item = 0
-		item_dict = 0
-		qid = 0
-		sitelink_check = 0
-		# continue
+	 print(page.title())
+	 	# See if we have a Wikidata item already
+	 try:
+	 	 wd_item = pywikibot.ItemPage.fromPage(page)
+	 	 item_dict = wd_item.get()
+	 	 qid = wd_item.title()
+	 	 print(f"Has a sitelink already - https://www.wikidata.org/wiki/{qid}")
+	 	 return 0
+	 except:
+	 	wd_item = 0
+	 	item_dict = 0
+	 	qid = 0
+	 	sitelink_check = 0
+	 	# continue
 
-	# If we're here, we don't - search for a match.
-	print('Searching for a match...')
-	months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-	date = page.title().replace('Category:','')
-	date = date.split('-')
-	print(date)
-	if len(date) != 3:
-		print('Something odd happened, skipping')
-		print(date)
-		return 0
+	 # If we're here, we don't - search for a match.
+	 print('Searching for a match...')
+	 months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+	 date = page.title().replace('Category:','')
+	 date = date.split('-')
+	 print(date)
+	 if len(date) != 3:
+	 	print('Something odd happened, skipping')
+	 	print(date)
+	 	return 0
 
-	day = date[2]
-	if day[0] == '0':
-		day = day[1]
-	datestr = months[int(date[1])-1] + ' ' + str(day) + ', ' + str(date[0])
-	print(datestr)
+	 day = date[2]
+	 if day[0] == '0':
+	 	day = day[1]
+	 datestr = f'{months[int(date[1]) - 1]} {str(day)}, {str(date[0])}'
+	 print(datestr)
 
-	wikidataEntries = search_entities(repo, datestr)
-	if wikidataEntries['search'] != []:
-		results = wikidataEntries['search']
-		numresults = len(results)
-		for i in range(0,numresults):
-			targetpage = pywikibot.ItemPage(wikidata_site, results[i]['id'])
-			item_dict = targetpage.get()
-			print('http://www.wikidata.org/wiki/'+results[i]['id'])
+	 wikidataEntries = search_entities(repo, datestr)
+	 if wikidataEntries['search'] != []:
+	 	 results = wikidataEntries['search']
+	 	 numresults = len(results)
+	 	 for i in range(numresults):
+	 	 	 targetpage = pywikibot.ItemPage(wikidata_site, results[i]['id'])
+	 	 	 item_dict = targetpage.get()
+	 	 	 print('http://www.wikidata.org/wiki/'+results[i]['id'])
 
-			# Make sure we don't have a sitelink already
-			sitelink_check = False
-			try:
-				sitelink = get_sitelink_title(item_dict['sitelinks']['commonswiki'])
-				print('http://commons.wikimedia.org/wiki/'+sitelink.replace(' ','_'))
-				sitelink_check = True
-			except:
-				pass
-			if sitelink_check:
-				print('Has sitelink')
-				continue
+	 	 	 # Make sure we don't have a sitelink already
+	 	 	 sitelink_check = False
+	 	 	 try:
+	 	 	 	sitelink = get_sitelink_title(item_dict['sitelinks']['commonswiki'])
+	 	 	 	print('http://commons.wikimedia.org/wiki/'+sitelink.replace(' ','_'))
+	 	 	 	sitelink_check = True
+	 	 	 except:
+	 	 	 	pass
+	 	 	 if sitelink_check:
+	 	 	 	print('Has sitelink')
+	 	 	 	continue
 
-			calday = False
-			P31 = ''
-			try:
-				P31 = item_dict['claims']['P31']
-			except:
-				print('No P31, skipping')
-				continue
-			if P31 != '':
-				for clm in P31:
-					# print(clm)
-					# print(clm.getTarget().title())
-					if clm.getTarget().title() == 'Q47150325':
-						calday = True
-			if not calday:
-				print('Not a calendar day, skipping')
-				continue
-			try:
-				print(item_dict['labels']['en'])
-			except:
-				print('')
-			print('http://commons.wikimedia.org/wiki/'+page.title().replace(' ','_'))
-			text = 'y'
-			if debug:
-				text = input("Save? ")
-			if text != 'n':
-				data = {'sitelinks': [{'site': 'commonswiki', 'title': page.title()}]}
-				targetpage.editEntity(data, summary=u'Add commons sitelink')
-				return 1
+	 	 	 calday = False
+	 	 	 P31 = ''
+	 	 	 try:
+	 	 	 	P31 = item_dict['claims']['P31']
+	 	 	 except:
+	 	 	 	print('No P31, skipping')
+	 	 	 	continue
+	 	 	 if P31 != '':
+	 	 	 	for clm in P31:
+	 	 	 		# print(clm)
+	 	 	 		# print(clm.getTarget().title())
+	 	 	 		if clm.getTarget().title() == 'Q47150325':
+	 	 	 			calday = True
+	 	 	 if not calday:
+	 	 	 	print('Not a calendar day, skipping')
+	 	 	 	continue
+	 	 	 try:
+	 	 	 	print(item_dict['labels']['en'])
+	 	 	 except:
+	 	 	 	print('')
+	 	 	 print('http://commons.wikimedia.org/wiki/'+page.title().replace(' ','_'))
+	 	 	 text = 'y'
+	 	 	 if debug:
+	 	 	 	text = input("Save? ")
+	 	 	 if text != 'n':
+	 	 	 	data = {'sitelinks': [{'site': 'commonswiki', 'title': page.title()}]}
+	 	 	 	targetpage.editEntity(data, summary=u'Add commons sitelink')
+	 	 	 	return 1
 
-	# Also try with a different date format (only datestr line is different from the above)
-	datestr = str(day) + ' ' + months[int(date[1])-1] + ' ' + str(date[0])
-	wikidataEntries = search_entities(repo, datestr)
-	if wikidataEntries['search'] != []:
-		results = wikidataEntries['search']
-		numresults = len(results)
-		for i in range(0,numresults):
-			targetpage = pywikibot.ItemPage(wikidata_site, results[i]['id'])
-			item_dict = targetpage.get()
-			print('http://www.wikidata.org/wiki/'+results[i]['id'])
+	 	# Also try with a different date format (only datestr line is different from the above)
+	 datestr = f'{str(day)} {months[int(date[1]) - 1]} {str(date[0])}'
+	 wikidataEntries = search_entities(repo, datestr)
+	 if wikidataEntries['search'] != []:
+	 	 results = wikidataEntries['search']
+	 	 numresults = len(results)
+	 	 for i in range(numresults):
+	 	 	 targetpage = pywikibot.ItemPage(wikidata_site, results[i]['id'])
+	 	 	 item_dict = targetpage.get()
+	 	 	 print('http://www.wikidata.org/wiki/'+results[i]['id'])
 
-			# Make sure we don't have a sitelink already
-			sitelink_check = False
-			try:
-				sitelink = get_sitelink_title(item_dict['sitelinks']['commonswiki'])
-				print('http://commons.wikimedia.org/wiki/'+sitelink.replace(' ','_'))
-				sitelink_check = True
-			except:
-				pass
-			if sitelink_check:
-				print('Has sitelink')
-				continue
+	 	 	 # Make sure we don't have a sitelink already
+	 	 	 sitelink_check = False
+	 	 	 try:
+	 	 	 	sitelink = get_sitelink_title(item_dict['sitelinks']['commonswiki'])
+	 	 	 	print('http://commons.wikimedia.org/wiki/'+sitelink.replace(' ','_'))
+	 	 	 	sitelink_check = True
+	 	 	 except:
+	 	 	 	pass
+	 	 	 if sitelink_check:
+	 	 	 	print('Has sitelink')
+	 	 	 	continue
 
-			calday = False
-			P31 = ''
-			try:
-				P31 = item_dict['claims']['P31']
-			except:
-				print('No P31, skipping')
-				continue
-			if P31 != '':
-				for clm in P31:
-					# print(clm)
-					# print(clm.getTarget().title())
-					if clm.getTarget().title() == 'Q47150325':
-						calday = True
-			if not calday:
-				print('Not a calendar day, skipping')
-				continue
-			try:
-				print(item_dict['labels']['en'])
-			except:
-				print('')
-			print('http://commons.wikimedia.org/wiki/'+page.title().replace(' ','_'))
-			text = 'y'
-			if debug:
-				text = input("Save? ")
-			if text != 'n':
-				data = {'sitelinks': [{'site': 'commonswiki', 'title': page.title()}]}
-				targetpage.editEntity(data, summary=u'Add commons sitelink')
-				return 1
+	 	 	 calday = False
+	 	 	 P31 = ''
+	 	 	 try:
+	 	 	 	P31 = item_dict['claims']['P31']
+	 	 	 except:
+	 	 	 	print('No P31, skipping')
+	 	 	 	continue
+	 	 	 if P31 != '':
+	 	 	 	for clm in P31:
+	 	 	 		# print(clm)
+	 	 	 		# print(clm.getTarget().title())
+	 	 	 		if clm.getTarget().title() == 'Q47150325':
+	 	 	 			calday = True
+	 	 	 if not calday:
+	 	 	 	print('Not a calendar day, skipping')
+	 	 	 	continue
+	 	 	 try:
+	 	 	 	print(item_dict['labels']['en'])
+	 	 	 except:
+	 	 	 	print('')
+	 	 	 print('http://commons.wikimedia.org/wiki/'+page.title().replace(' ','_'))
+	 	 	 text = 'y'
+	 	 	 if debug:
+	 	 	 	text = input("Save? ")
+	 	 	 if text != 'n':
+	 	 	 	data = {'sitelinks': [{'site': 'commonswiki', 'title': page.title()}]}
+	 	 	 	targetpage.editEntity(data, summary=u'Add commons sitelink')
+	 	 	 	return 1
 
-	# If we're here, it hasn't worked, return 0
-	return 0
+	 # If we're here, it hasn't worked, return 0
+	 return 0
 
 # Run through the category contents
 cat = pywikibot.Category(commons, targetcat)
 for result in pagegenerators.SubCategoriesPageGenerator(cat, recurse=False):
-	if trip == 0:
-		if 'Category:2000' not in result.title():
-			continue
-		else:
-			trip = 1
-	nummodified += do_date_find(result)
-	if nummodified >= maxnum:
-		print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
-		break
+	 if trip == 0:
+	 	 if 'Category:2000' not in result.title():
+	 	 	 continue
+	 	 else:
+	 	 	 trip = 1
+	 nummodified += do_date_find(result)
+	 if nummodified >= maxnum:
+	 	 print(f'Reached the maximum of {str(maxnum)} entries modified, quitting!')
+	 	 break
 
 # EOF

@@ -37,13 +37,13 @@ for target in targets:
 		continue
 	print("\nhttps://www.wikidata.org/wiki/" + qid)
 	try:
-		sitelink = get_sitelink_title(item_dict['sitelinks'][lang+'wiki'])
+		sitelink = get_sitelink_title(item_dict['sitelinks'][f'{lang}wiki'])
 		print(sitelink)
 	except:
-		print(lang + ' sitelink not found!')
+		print(f'{lang} sitelink not found!')
 		continue
 
-	url = u'https://'+lang+'.wikipedia.org/wiki/'+sitelink.replace(' ','_')
+	url = f'https://{lang}.wikipedia.org/wiki/' + sitelink.replace(' ','_')
 	url = urllib.parse.quote(url.encode('utf8'), ':/')
 	print(url)
 	try:
@@ -52,6 +52,8 @@ for target in targets:
 		print(e.code)
 		if e.code == 404:
 			print('Removing link')
-			page.removeSitelink(site=lang+'wiki', summary=u'Removing broken sitelink to '+lang+'wiki')
+			page.removeSitelink(
+				site=f'{lang}wiki', summary=f'Removing broken sitelink to {lang}wiki'
+			)
 	# exit()
 # EOF

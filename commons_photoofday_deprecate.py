@@ -36,7 +36,7 @@ def migrate_photooftheday(target):
 	except:
 		# No downside if we didn't find the value
 		pass
-	print('https://www.wikidata.org/wiki/'+qid)
+	print(f'https://www.wikidata.org/wiki/{qid}')
 
 	# Check that we're looking at a calendar day item
 	calday = False
@@ -92,7 +92,7 @@ def migrate_photooftheday(target):
 					newtext = info.replace('file description=','').replace('text=','')
 					testing = False
 					count = 0
-					while testing == False:
+					while not testing:
 						count += 1
 						if count > 10:
 							# This hasn't worked
@@ -110,27 +110,21 @@ def migrate_photooftheday(target):
 							else:
 								toreplace.append([newtext[startindex:startindex+endindex+2],newtext[startindex+4:startindex+endindex]])
 								newtext = newtext.replace(newtext[startindex:startindex+endindex+2], newtext[startindex+4:startindex+endindex])
-					# if newtext[0] == '[':
-						# Avoid cases that are just wikilinks
-						# continue
 					# Try to strip out wikilinks
 					# newtext = re.sub('\[\[([:^\]\|]*)\]\]', '\\1', newtext)
 					# newtext = re.sub('\[\[([^\]\|]*)\]\]', '\\1', newtext)
 					if caption == '':
 						caption += newtext
 					else:
-						caption = newtext + ' ' + caption
+						caption = f'{newtext} {caption}'
 
-			print('File name: ' + filename)
+			print(f'File name: {filename}')
 			caption = caption.strip()
-			print('Caption: ' + caption)
-			if filename != '':
-				test = input('Save?')
-			else:
-				test = 'n'
+			print(f'Caption: {caption}')
+			test = input('Save?') if filename != '' else 'n'
 			if test == 'y':
 				try:
-					targetimage = pywikibot.FilePage(commons, 'File:'+filename)
+					targetimage = pywikibot.FilePage(commons, f'File:{filename}')
 					# print(targetimage)
 					if targetimage.text == '':
 						print('Target image not found, skipping')
@@ -153,9 +147,9 @@ def migrate_photooftheday(target):
 			startindex = newtext.find('{{PhotoOfTheDay')
 			endindex = newtext[startindex:].find('}}')
 			if '{{Wikidata Infobox}}' not in target.text:
-				newtext = newtext[0:startindex] + '{{Wikidata Infobox}}' + newtext[endindex+2:]
+				newtext = newtext[:startindex] + '{{Wikidata Infobox}}' + newtext[endindex+2:]
 			else:
-				newtext = newtext[0:startindex] + newtext[endindex+2:]
+				newtext = newtext[:startindex] + newtext[endindex+2:]
 			# Do some extra tidying up
 			newtext = newtext.replace('{{Interwiki from wikidata}}','')
 			newtext = newtext.replace('\n\n\n','\n')
@@ -163,10 +157,7 @@ def migrate_photooftheday(target):
 			newtext = newtext.replace('\n\n{{Wikidata Infobox','\n{{Wikidata Infobox')
 
 			print(newtext)
-			if filename != '':
-				test = input('Save?')
-			else:
-				test = 'y'
+			test = input('Save?') if filename != '' else 'y'
 			if test == 'y':
 				target.text = newtext
 				target.save('Migrating from {{PhotoOfTheDay}} to {{Wikidata Infobox}}, matching ID is ' + str(qid))

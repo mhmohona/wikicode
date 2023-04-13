@@ -14,7 +14,7 @@ from pywikibot import textlib
 commons = pywikibot.Site('commons', 'commons')
 repo = commons.data_repository()  # this is a DataSite object
 
-while(True):
+while True:
 
 	categoryname = input('Category name?')
 	categoryname = categoryname.strip()
@@ -59,7 +59,7 @@ while(True):
 		print('\n')
 		print(subcat.title())
 		topass = False
-		if subcat.title() == commonscat_page.title() or subcat.title() == subcommonscat_page.title():
+		if subcat.title() in [commonscat_page.title(), subcommonscat_page.title()]:
 			topass = True
 		if toexclude != ['']:
 			for exclude in toexclude:
@@ -67,15 +67,17 @@ while(True):
 					topass = True
 		if topass:
 			continue
-		
+
 		try:
 			target_text = subcat.get()
 		except:
 			print('Error, subcat not found!')
 			continue
-		target_text = target_text.replace("[["+commonscat_page.title(),"[["+subcommonscat_page.title())
+		target_text = target_text.replace(
+			f"[[{commonscat_page.title()}", f"[[{subcommonscat_page.title()}"
+		)
 		print(target_text)
-		savemessage = 'Moving from "' + commonscat_page.title() + '" to "' + subcommonscat_page.title() + '"'
+		savemessage = f'Moving from "{commonscat_page.title()}" to "{subcommonscat_page.title()}"'
 		# input('Continue?')
 		subcat.text = target_text.strip()
 		subcat.save(savemessage)

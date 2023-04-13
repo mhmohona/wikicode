@@ -52,7 +52,7 @@ def checkid(targetcat):
         target_text = targetcat.get()
 
         id_val = 0
-        for i in range(0,len(templates)):
+        for i in range(len(templates)):
             # try:
             #     value = (target_text.split("{{"+templates[i]+"|"))[1].split("|")[0]
             #     if value and id_val == 0:
@@ -126,10 +126,10 @@ def checkid(targetcat):
                         print(data)
                         # text = raw_input("Save? ")
                         # if text == 'y':
-                        page.editEntity(data, summary=u'Add commons sitelink based on '+shortname+'')
+                        page.editEntity(data, summary=f'Add commons sitelink based on {shortname}')
                         return 1
-                        # else:
-                        #     return 0
+                                            # else:
+                                            #     return 0
                     except:
                         print('Edit failed')
                         return 0
@@ -145,23 +145,21 @@ def checkid(targetcat):
 # nummodified += checkid(cat)
 # targetcats = pagegenerators.SubCategoriesPageGenerator(cat, recurse=False);
 
-template = pywikibot.Page(commons, 'Template:'+templates[0])
+template = pywikibot.Page(commons, f'Template:{templates[0]}')
 
 targetcats = template.embeddedin(namespaces='14')
 
 
-i = 0
-for targetcat in targetcats:
+for i, targetcat in enumerate(targetcats):
     # print targetcat
     # print "\n" + targetcat.title()
     # print target.text
     nummodified += checkid(targetcat)
-    print(str(nummodified) + "/" + str(i))
-    i += 1
+    print(f"{str(nummodified)}/{str(i)}")
     if nummodified >= maxnum:
-        print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
+        print(f'Reached the maximum of {str(maxnum)} entries modified, quitting!')
         exit()
 
-print('Done! Edited ' + str(nummodified) + ' entries')
+print(f'Done! Edited {str(nummodified)} entries')
                 
 # EOF

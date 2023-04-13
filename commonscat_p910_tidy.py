@@ -46,8 +46,10 @@ def get_commons_redirect_target(category):
 
 maxnum = 10000
 step = 50
-num = int(maxnum/step)
-for i in range(0,num):
+num = maxnum // step
+bad_commonscat_count = 0
+bad_sitelink_count = 0
+for i in range(num):
 	query = 'SELECT ?item ?categoryitem ?commonscategory WHERE {'\
 	'  ?item wdt:P910 ?categoryitem .'\
 	'  ?commonscategory schema:about ?item .'\
@@ -57,8 +59,6 @@ for i in range(0,num):
 	print(query)
 
 	generator = pagegenerators.WikidataSPARQLPageGenerator(query, site=wikidata_site)
-	bad_commonscat_count = 0
-	bad_sitelink_count = 0
 	interwiki_conflicts = []
 	for page in generator:
 		# Get the info about the topic item
@@ -110,17 +110,21 @@ for i in range(0,num):
 		print(sitelink2)
 		text = 'n'
 		if redirect1 == sitelink2.replace('Category:',''):
-			print('Will remove ' + sitelink)
-			# text = raw_input("Save? ")
+			print(f'Will remove {sitelink}')
+					# text = raw_input("Save? ")
 		elif redirect2 == sitelink.replace('Category:',''):
-			print('Will remove ' + sitelink2)
-			# text = raw_input("Save? ")
+			print(f'Will remove {sitelink2}')
+					# text = raw_input("Save? ")
 		else:
 			print('No change')
 
 		if text != 'n':
 			if redirect1 == sitelink2.replace('Category:',''):
-				page.removeSitelink(site='commonswiki', summary=u'Removing Commons sitelink as it is a redirect to the category sitelinked in the linked category item (' + str(p910_id) + ')')
+				page.removeSitelink(
+					site='commonswiki',
+					summary=f'Removing Commons sitelink as it is a redirect to the category sitelinked in the linked category item ({str(p910_id)}'
+					+ ')',
+				)
 			elif redirect2 == sitelink.replace('Category:',''):
 				val.removeSitelink(site='commonswiki', summary=u'Removing Commons sitelink as it is a redirect to the category sitelinked in the linked topic item (' + str(qid) + ')')
 		

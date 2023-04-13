@@ -27,29 +27,19 @@ def fixcat(targetcat):
     target_text = target_text.replace("{{wikidata Infobox}}", "{{Wikidata Infobox|defaultsort=no}}")
     target_text = target_text.replace("{{wikidata infobox}}", "{{Wikidata Infobox|defaultsort=no}}")
 
-    # Time to save it
-    if (target_text != targetcat.get()):
-        print(target_text)
-        targetcat.text = target_text.strip()
-        if manual == 1:
-            text = raw_input("Save on Commons? ")
-            if text == 'y':
-                try:
-                    targetcat.save(savemessage)
-                    return 1
-                except:
-                    print("That didn't work!")
-                    return 0
-            else:
-                return 0
-        else:
-            try:
-                targetcat.save(savemessage)
-                return 1
-            except:
-                print("That didn't work!")
-                return 0
-    else:
+    if target_text == targetcat.get():
+        return 0
+    print(target_text)
+    targetcat.text = target_text.strip()
+    if manual == 1:
+        text = raw_input("Save on Commons? ")
+        if text != 'y':
+            return 0
+    try:
+        targetcat.save(savemessage)
+        return 1
+    except:
+        print("That didn't work!")
         return 0
 
 
@@ -71,9 +61,9 @@ for targetcat in targetcats:
     nummodified += fixcat(targetcat)
 
     if nummodified >= maxnum:
-        print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
+        print(f'Reached the maximum of {str(maxnum)} entries modified, quitting!')
         exit()
 
-print('Done! Edited ' + str(nummodified) + ' entries')
+print(f'Done! Edited {str(nummodified)} entries')
                 
 # EOF

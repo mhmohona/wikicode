@@ -11,31 +11,22 @@ def countfiles(text):
 	# Check for unmarked files
 	lines = text.splitlines()
 	trip = 0
-	for i in range(0,len(lines)):
+	for i in range(len(lines)):
 		if '</gallery' in lines[i]:
 			trip = 0
-		if trip == 1:
-			if 'file:' not in lines[i] and 'image:' not in lines[i]:
-				lines[i] = 'file:'+lines[i]
+		if trip == 1 and 'file:' not in lines[i] and 'image:' not in lines[i]:
+			lines[i] = f'file:{lines[i]}'
 		if '<gallery' in lines[i]:
 			trip = 1
 	text = "\n".join(lines)
 	text = text.replace(':file:','').replace(':image:','')
 
-	# Count the number of files
-	count = text.count('file:')
-	count = count + text.count('image:')
-
+	count = text.count('file:') + text.count('image:')
 	# Get the filenames
 	test = text.split('file:')
-	filelist = []
-	for i in range(1,len(test)-1):
-		filelist.append(test[i].split('.')[0])
+	filelist = [test[i].split('.')[0] for i in range(1,len(test)-1)]
 	test = text.split('image:')
-	filelist = []
-	for i in range(1,len(test)-1):
-		filelist.append(test[i].split('.')[0])
-
+	filelist = [test[i].split('.')[0] for i in range(1,len(test)-1)]
 	return count, filelist
 
 commons = pywikibot.Site('commons', 'commons')
@@ -87,10 +78,10 @@ while numchecked < maxnum:
 
 			# print('* [['+target.title()+']] - ' + str(lastadded))
 			# print(int(str(lastadded)[0:4]))
-			if int(str(lastadded)[0:4]) < 2016:
-				log = "* '''[["+target.title()+"]]''' - " + str(lastadded)
+			if int(str(lastadded)[:4]) < 2016:
+				log = f"* '''[[{target.title()}]]''' - {str(lastadded)}"
 			else:
-				log = "* [["+target.title()+"]] - " + str(lastadded)
+				log = f"* [[{target.title()}]] - {str(lastadded)}"
 			# print(log)
 			# test = input('Continue?')
 
@@ -110,7 +101,7 @@ while numchecked < maxnum:
 				good.append(log)
 
 		if numchecked >= maxnum:
-			print('Reached the maximum of ' + str(maxnum) + ' entries checked, quitting!')
+			print(f'Reached the maximum of {maxnum} entries checked, quitting!')
 			break
 
 print('== Bad (0 files) ==')

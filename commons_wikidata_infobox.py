@@ -148,7 +148,7 @@ def addtemplate(target):
     if any(option in target_text for option in templatestoavoid):
         for option in templatestoavoid:
             if option in target_text:
-                print('Category uses ' + option + ', skipping')
+                print(f'Category uses {option}, skipping')
         return 0
 
     # Check the Wikidata item to see if we want to skip this.
@@ -278,22 +278,14 @@ def addtemplate(target):
     print(savemessage)
     if manual:
         text = raw_input("Save on Commons? ")
-        if text == 'y':
-            try:
-                target.save(savemessage)
-                return 1
-            except:
-                print("That didn't work!")
-                return 0
-        else:
+        if text != 'y':
             return 0
-    else:
-        try:
-            target.save(savemessage)
-            return 1
-        except:
-            print("That didn't work!")
-            return 0
+    try:
+        target.save(savemessage)
+        return 1
+    except:
+        print("That didn't work!")
+        return 0
 
 # That's the end of the function, now on to the category walkers
 

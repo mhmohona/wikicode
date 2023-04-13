@@ -19,17 +19,19 @@ maxnum = 100000
 nummodified = 0
 stepsize =  10000
 maximum = 2000000
-numsteps = int(maximum / stepsize)
+numsteps = maximum // stepsize
 
 wikidata_site = pywikibot.Site("wikidata", "wikidata")
 repo = wikidata_site.data_repository()  # this is a DataSite object
 commons = pywikibot.Site('commons', 'commons')
 debug = 0
+bad_commonscat_count = 0
+bad_sitelink_count = 0
 # query = 'SELECT ?item ?categoryitem ?commonscategory WHERE { ?item wdt:P910 ?categoryitem . ?commonscategory schema:about ?item . ?commonscategory schema:isPartOf <https://commons.wikimedia.org/> . FILTER REGEX(STR(?commonscategory), "https://commons.wikimedia.org/wiki/Category:") . }'
 # if debug:
 #     query = query + " LIMIT 1000"
-for i in range(0,numsteps):
-	print('Starting at ' + str(i*stepsize))
+for i in range(numsteps):
+	print(f'Starting at {str(i * stepsize)}')
 
 	query = 'SELECT ?item ?categoryitem ?commonscategory\n'\
 		'WITH { \n'\
@@ -47,8 +49,6 @@ for i in range(0,numsteps):
 	print(query)
 
 	generator = pagegenerators.WikidataSPARQLPageGenerator(query, site=wikidata_site)
-	bad_commonscat_count = 0
-	bad_sitelink_count = 0
 	interwiki_conflicts = []
 	for page in generator:
 		# Get the page
@@ -72,9 +72,7 @@ for i in range(0,numsteps):
 			print('No P910 value found!')
 			continue
 
-		p910_check = 0
-		for clm in p910:
-			p910_check += 1
+		p910_check = sum(1 for _ in p910)
 		# Only attempt to do this if there is only one value for P910
 		if p910_check != 1:
 			print('More than one P910 value found! Skipping...')
@@ -103,7 +101,7 @@ for i in range(0,numsteps):
 			if test_p31 != 1:
 				print('Target is not a category item - skipping!')
 				continue
-				
+
 			try:
 				sitelink2 = get_sitelink_title(target_dict['sitelinks']['commonswiki'])
 				print(sitelink2)
@@ -118,10 +116,8 @@ for i in range(0,numsteps):
 			except:
 				print('No P301 value found!')
 				continue
-			p301_check = 0
 			retarget = 0
-			for clm2 in p301:
-				p301_check += 1
+			p301_check = sum(1 for _ in p301)
 			# Only attempt to do this if there is only one value for P910
 			if p301_check != 1:
 				print('More than one P301 value found! Skipping...')
@@ -140,9 +136,15 @@ for i in range(0,numsteps):
 			# if text == 'y':
 			try:
 				print('Saving!')
-				page.removeSitelink(site='commonswiki', summary=u'Moving commons category sitelink to category item ([[' + str(wd_id) + ']])')
+				page.removeSitelink(
+					site='commonswiki',
+					summary=f'Moving commons category sitelink to category item ([[{str(wd_id)}]])',
+				)
 				time.sleep(5)
-				val.editEntity(data, summary=u'Moving commons category sitelink from main item ([[' + str(qid) + ']])')
+				val.editEntity(
+					data,
+					summary=f'Moving commons category sitelink from main item ([[{str(qid)}]])',
+				)
 				nummodified += 1
 			except:
 				print('Edit failed!')
@@ -160,9 +162,9 @@ for i in range(0,numsteps):
 					print('Unable to save label edit on Wikidata!')
 
 			if nummodified >= maxnum:
-				print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
+				print(f'Reached the maximum of {maxnum} entries modified, quitting!')
 				exit()
 
-	print('Done! Edited ' + str(nummodified) + ' entries')
+	print(f'Done! Edited {str(nummodified)} entries')
 		 
 	# EOF

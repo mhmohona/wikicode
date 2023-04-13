@@ -38,10 +38,9 @@ for targetcat in targetcats:
         if trap == 1:
             if target.title() == skipto:
                 trap = 0
-                continue
             else:
                 print(target.title())
-                continue
+            continue
         if 'Category:' in target.title():
             redirect = ''
             try:
@@ -62,7 +61,7 @@ for targetcat in targetcats:
                                 redirect = (target.text.split("{{" + option + " |"))[1].split("}}")[0].split("|")[0]
                             except:
                                 try:
-                                    redirect = (target.text.split(option + " |"))[1].split("}}")[0].split("|")[0]
+                                    redirect = target.text.split(f"{option} |")[1].split("}}")[0].split("|")[0]
                                 except:
                                     print('Wikitext parsing bug!')
                         redirect = redirect.replace(u":Category:","")
@@ -71,7 +70,14 @@ for targetcat in targetcats:
                     # We have a redirect. Let's update its' commons sitelink on Wikidata.
                     print(redirect)
                     try:
-                        data = {'sitelinks': [{'site': 'commonswiki', 'title': u"Category:" + redirect}]}
+                        data = {
+                            'sitelinks': [
+                                {
+                                    'site': 'commonswiki',
+                                    'title': f"Category:{redirect}",
+                                }
+                            ]
+                        }
                         wd_item.editEntity(data, summary=u'Update commons sitelink to avoid commons category redirect')
                         nummodified += 1
                     except:
@@ -79,11 +85,11 @@ for targetcat in targetcats:
                         # report_text = report.get()
                         # report.text = report_text + "\n* [[:"+target.title()+"]] -> [[:Category:"+redirect+"]]\n"
                         # report.save('+1')
-            
+
         if nummodified >= maxnum:
-            print('Reached the maximum of ' + str(maxnum) + ' entries modified, quitting!')
+            print(f'Reached the maximum of {maxnum} entries modified, quitting!')
             exit()
 
-print('Done! Edited ' + str(nummodified) + ' entries')
+print(f'Done! Edited {str(nummodified)} entries')
                 
 # EOF

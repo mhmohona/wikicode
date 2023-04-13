@@ -42,23 +42,27 @@ for regex in regexes:
         pmids = re.findall(r'\|\s*?pmid\s*?\=\s*?(\d+?)\s*?\|', text)
         print (len(pmids))
         for pmid in pmids:
-            if "* " + str(pmid) + " -" not in checkedpages:
-                checkedpages.append("* " + str(pmid) + " - [[" + page.title() + "]]")
+            if f"* {str(pmid)} -" not in checkedpages:
+                checkedpages.append(f"* {str(pmid)} - [[{page.title()}]]")
             else:
-                index = [idx for idx, s in enumerate(checkedpages) if "* " + str(pmid) + " -" in s][0]
-                checkedpages[index] += ", [[" + page.title() + "]]"
+                index = [
+                    idx
+                    for idx, s in enumerate(checkedpages)
+                    if f"* {str(pmid)} -" in s
+                ][0]
+                checkedpages[index] += f", [[{page.title()}]]"
 
         if len(checkedpages) > maxnum:
-            print ('Reached the maximum of ' + str(maxnum) + ' pages loaded, saving!')
+            print(f'Reached the maximum of {maxnum} pages loaded, saving!')
             break
     if len(checkedpages) > maxnum:
-        print ('Reached the maximum of ' + str(maxnum) + ' pages loaded, saving!')
+        print(f'Reached the maximum of {maxnum} pages loaded, saving!')
         break
-            
-print (str(i) + " pages checked, " + str(len(checkedpages)) + " recorded!")
+
+print(f"{str(i)} pages checked, {len(checkedpages)} recorded!")
 checkedpages.sort()
-for i in range(0,len(checkedpages)):
-    reporttext += checkedpages[i] + "\n"
+for checkedpage in checkedpages:
+    reporttext += checkedpage + "\n"
 report.text = reporttext
 print (reporttext)
 report.save('Update')

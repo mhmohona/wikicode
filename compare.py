@@ -28,7 +28,7 @@ with open('sorted.csv', encoding="utf-8") as csvfile:
 	for row in read_in:
 		vals = row[2].splitlines()
 		if vals[0] != "Title":
-			for i in range(0,len(vals)):
+			for i in range(len(vals)):
 				vals[i] += '\n'
 			# print(vals)
 			lightroom = lightroom + vals
@@ -65,13 +65,13 @@ print(len(lightroom_not_commons))
 
 text_file = codecs.open('category_only.txt', 'w', encoding='utf-8')
 for item in commons_only:
-  text_file.write("%s" % item)
+	text_file.write(f"{item}")
 text_file.close()
 
 
 text_file = codecs.open('watchlist_only.txt', 'w', encoding='utf-8')
 for item in local_only:
-  text_file.write("%s" % item)
+	text_file.write(f"{item}")
 text_file.close()
 
 text_file = codecs.open('commons_not_lightroom.txt', 'w', encoding='utf-8')

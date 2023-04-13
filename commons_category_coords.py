@@ -13,8 +13,7 @@ def get_precision(val):
 		length = len(val)
 	else:
 		length = 0
-	if length >= 5:
-		length = 5
+	length = min(length, 5)
 	# print(len(val))
 	return 10**-length
 
@@ -23,15 +22,14 @@ def calc_coord(params):
 	lat = False
 	lon = False
 	precision = False
-	if len(params) >= 8:
-		if 'S' in params[3] or 'N' in params[3]:
-			lat = float(params[0]) + (float(params[1])/60.0)+(float(params[2])/(60.0*60.0))
-			if 'S' in params[3]:
-				lat = -lat
-			lon = float(params[4]) + (float(params[5])/60.0)+(float(params[6])/(60.0*60.0))
-			if 'W' in params[7] or 'O' in params[7]:
-				lon = -lon
-			precision = get_precision(params[2])/(60.0*60.0)
+	if len(params) >= 8 and ('S' in params[3] or 'N' in params[3]):
+		lat = float(params[0]) + (float(params[1])/60.0)+(float(params[2])/(60.0*60.0))
+		if 'S' in params[3]:
+			lat = -lat
+		lon = float(params[4]) + (float(params[5])/60.0)+(float(params[6])/(60.0*60.0))
+		if 'W' in params[7] or 'O' in params[7]:
+			lon = -lon
+		precision = get_precision(params[2])/(60.0*60.0)
 	if lat == False and len(params) > 2:
 		if ('S' in params[2] or 'N' in params[2]) and len(params) >= 5:
 			lat = float(params[0]) + (float(params[1])/60.0)
@@ -41,13 +39,13 @@ def calc_coord(params):
 			if 'W' in params[5] or 'O' in params[5]:
 				lon = -lon
 			precision = get_precision(params[1])/(60.0)
-		elif (params[1] == 'N' or params[1] == 'S') and len(params) >= 3:
+		elif params[1] in ['N', 'S'] and len(params) >= 3:
 			lat = float(params[0])
 			lon = float(params[2])
 			precision = get_precision(params[0])
 			if params[1] == 'S':
 				lat = -lat
-			if params[3] == 'W' or params[3] == 'O':
+			if params[3] in ['W', 'O']:
 				lon = -lon
 		elif '.' in params[0] and '.' in params[1]:
 			lat = float(params[0])
@@ -85,10 +83,7 @@ def check_match(lat1, lon1, prec1, lat2, lon2, prec2):
 	distance = 6373.0 * c
 	print(distance)
 	# print(6373.0*prec)
-	if distance < 10:
-		return True
-	else:
-		return False
+	return distance < 10
 
 commons = pywikibot.Site('commons', 'commons')
 repo = commons.data_repository()
@@ -100,7 +95,7 @@ remove_from_commons = False
 numedited = 0
 maxnumedited = 2000
 
-template = pywikibot.Page(commons, 'Template:'+coord_templates[0])
+template = pywikibot.Page(commons, f'Template:{coord_templates[0]}')
 targetcats = template.embeddedin(namespaces='14')
 for cat in targetcats:
 	print('https://commons.wikimedia.org/wiki/'+cat.title().replace(" ","_"))
@@ -121,7 +116,7 @@ for cat in targetcats:
 	except:
 		null = 0
 
-	print('https://www.wikidata.org/wiki/'+wd_item.title())
+	print(f'https://www.wikidata.org/wiki/{wd_item.title()}')
 
 	ishuman = False
 	P31 = ''
@@ -133,7 +128,14 @@ for cat in targetcats:
 		for clm in P31:
 			# print(clm)
 			# print(clm.getTarget().title())
-			if clm.getTarget().title() == 'Q5' or clm.getTarget().title() == 'Q4830453' or clm.getTarget().title() == 'Q783794' or clm.getTarget().title() == 'Q22667' or clm.getTarget().title() == 'Q13406463' or clm.getTarget().title() == 'Q4167836': 
+			if clm.getTarget().title() in [
+				'Q5',
+				'Q4830453',
+				'Q783794',
+				'Q22667',
+				'Q13406463',
+				'Q4167836',
+			]: 
 				ishuman = True
 	if ishuman:
 		print('Not importing coordinate for a human, business, company, railway, list, or category')
@@ -163,68 +165,67 @@ for cat in targetcats:
 			if tpl in template[0].title():
 				count += 1
 	if count != 1:
-		print('Wrong number of coordinate templates (' + str(count) + '), skipping')
+		print(f'Wrong number of coordinate templates ({str(count)}), skipping')
 		continue
 
 	done = False
 	for template in cat.templatesWithParams():
 		for tpl in coord_templates:
 			# print(tpl)
-			if not done:
-				if tpl in template[0].title():
-					# print(template)
-					print(template[0].title())
-					print(template[1])
-					if 'wikidata' not in str(template[1]) and 'Wikidata' not in str(template[1]):
+			if not done and tpl in template[0].title():
+				# print(template)
+				print(template[0].title())
+				print(template[1])
+				if 'wikidata' not in str(template[1]) and 'Wikidata' not in str(template[1]):
+					try:
+						lat, lon, precision = calc_coord(template[1])
+						if not coordinate:
+							coordinateclaim  = pywikibot.Claim(repo, u'P625')
+							coordinate = pywikibot.Coordinate(lat=lat, lon=lon, precision=precision, site=commons,globe_item=globe_item)
+							coordinateclaim.setTarget(coordinate)
+							test = 'y'
+							if debug:
+								test = input('Save coordinate?')
+							if test == 'y':
+								wd_item.addClaim(coordinateclaim, summary=u'Importing coordinate from Commons')
+								numedited += 1
+								done = True
+						test1 = check_match(lat, lon, precision, coordinate.lat, coordinate.lon, coordinate.precision)
+					except:
+						test1 = False
+				else:
+					test1 = True
+				if test1 and remove_from_commons:
+					edit_test = False
+					try:
+						template_string = '{{'+tpl+cat.text.split('{{'+tpl)[1].split('}}')[0]+"}}"
+						print(template_string)
+						target_text = cat.text.replace(template_string,'')
+						edit_test = True
+					except:
 						try:
-							lat, lon, precision = calc_coord(template[1])
-							if not coordinate:
-								coordinateclaim  = pywikibot.Claim(repo, u'P625')
-								coordinate = pywikibot.Coordinate(lat=lat, lon=lon, precision=precision, site=commons,globe_item=globe_item)
-								coordinateclaim.setTarget(coordinate)
-								test = 'y'
-								if debug:
-									test = input('Save coordinate?')
-								if test == 'y':
-									wd_item.addClaim(coordinateclaim, summary=u'Importing coordinate from Commons')
-									numedited += 1
-									done = True
-							test1 = check_match(lat, lon, precision, coordinate.lat, coordinate.lon, coordinate.precision)
-						except:
-							test1 = False
-					else:
-						test1 = True
-					if test1 and remove_from_commons:
-						edit_test = False
-						try:
-							template_string = '{{'+tpl+cat.text.split('{{'+tpl)[1].split('}}')[0]+"}}"
+							template_string = '{{'+tpl.lower()+cat.text.split('{{'+tpl.lower())[1].split('}}')[0]+"}}"
 							print(template_string)
 							target_text = cat.text.replace(template_string,'')
 							edit_test = True
 						except:
-							try:
-								template_string = '{{'+tpl.lower()+cat.text.split('{{'+tpl.lower())[1].split('}}')[0]+"}}"
-								print(template_string)
-								target_text = cat.text.replace(template_string,'')
-								edit_test = True
-							except:
-								edit_test = False
-								continue
-						if edit_test:
-							target_text = target_text.replace('\n\n\n','\n').rstrip('\n').lstrip('\n')
-							if 'Wikidata Infobox' not in target_text:
-								target_text = "{{Wikidata Infobox}}\n" + target_text
-							target_text = target_text.replace('\n\n\n','\n').strip().rstrip('\n').lstrip('\n')
+							edit_test = False
+							continue
+					if edit_test:
+						target_text = target_text.replace('\n\n\n','\n').rstrip('\n').lstrip('\n')
+						if 'Wikidata Infobox' not in target_text:
+							target_text = "{{Wikidata Infobox}}\n" + target_text
+						target_text = target_text.replace('\n\n\n','\n').strip().rstrip('\n').lstrip('\n')
 
-							print("New text:")
-							print(target_text)
-							test = 'y'
-							if debug:
-								test = input('Remove from Commons')
-							if test == 'y':
-								cat.text = target_text
-								cat.save('Coordinates now through the infobox')
-								numedited += 1
+						print("New text:")
+						print(target_text)
+						test = 'y'
+						if debug:
+							test = input('Remove from Commons')
+						if test == 'y':
+							cat.text = target_text
+							cat.save('Coordinates now through the infobox')
+							numedited += 1
 
 			if numedited >= maxnumedited:
 				print(numedited)

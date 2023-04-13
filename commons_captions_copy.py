@@ -109,44 +109,44 @@ def prettyPrint(variable):
 
 def check_and_set_caption(target):
 
-    # Test using the Wikidata sandbox
-    # captions = get_caption(repo, 'Q4115189')
-    # prettyPrint(captions)
-    # test = set_caption(repo, 'Q4115189', 'This is a test',language='en')
-    # exit()
+     # Test using the Wikidata sandbox
+     # captions = get_caption(repo, 'Q4115189')
+     # prettyPrint(captions)
+     # test = set_caption(repo, 'Q4115189', 'This is a test',language='en')
+     # exit()
 
-    # token = get_login_token(commons)
-    # prettyPrint(token)
-    # print token['query']['tokens']['logintoken']
-    # login = do_login(commons, token['query']['tokens']['logintoken'])
-    # prettyPrint(login)
-    # tokens = get_token(commons)
-    # prettyPrint(tokens)
-    # edittoken = tokens['query']['tokens']['csrftoken']
-    # print edittoken
-    # userinfo = get_userinfo(commons)
-    # prettyPrint(userinfo)
-    # return 1
+     # token = get_login_token(commons)
+     # prettyPrint(token)
+     # print token['query']['tokens']['logintoken']
+     # login = do_login(commons, token['query']['tokens']['logintoken'])
+     # prettyPrint(login)
+     # tokens = get_token(commons)
+     # prettyPrint(tokens)
+     # edittoken = tokens['query']['tokens']['csrftoken']
+     # print edittoken
+     # userinfo = get_userinfo(commons)
+     # prettyPrint(userinfo)
+     # return 1
 
-    print (target.title())
-    filetext = target.get()
-    if '{{en|1=' in filetext:
-        caption = filetext.split('{{en|1=')[1].split('}}')[0]
-        print (caption)
-    # Get the media ID
-    mid_temp = get_mid(commons, target.title())
-    prettyPrint(mid_temp)
-    for val in mid_temp['query']['pages']:
-        # print val
-        mid = val
-    print (mid)
+     print (target.title())
+     filetext = target.get()
+     if '{{en|1=' in filetext:
+         caption = filetext.split('{{en|1=')[1].split('}}')[0]
+         print (caption)
+     # Get the media ID
+     mid_temp = get_mid(commons, target.title())
+     prettyPrint(mid_temp)
+     for val in mid_temp['query']['pages']:
+         # print val
+         mid = val
+     print (mid)
 
-    captions = get_caption(commons, 'M'+str(mid))
-    prettyPrint(captions)
+     captions = get_caption(commons, f'M{str(mid)}')
+     prettyPrint(captions)
 
-    test = set_caption(commons, 'M'+str(mid), caption,language='en')
+     test = set_caption(commons, f'M{str(mid)}', caption, language='en')
 
-    return 0
+     return 0
 
 # That's the end of the function definitions, now run them.
 

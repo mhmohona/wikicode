@@ -32,20 +32,22 @@ def newitem(category, enwp, items,commonscat_has_item=False):
 
 	if commonscat_has_item:
 		data = {'sitelinks': [{'site': 'commonswiki', 'title': category.title()}, {'site': enwp_site, 'title': enwp.title()}]}
-		candidate_item.editEntity(data, summary=u'Add commons and '+enwp_site+' sitelink')
+		candidate_item.editEntity(
+			data, summary=f'Add commons and {enwp_site} sitelink'
+		)
 	else:
 		data = {'sitelinks': [{'site': enwp_site, 'title': enwp.title()}]}
-		candidate_item.editEntity(data, summary=u'Add '+enwp_site+' sitelink')
+		candidate_item.editEntity(data, summary=f'Add {enwp_site} sitelink')
 
 
 	for item in items:
 		claim = pywikibot.Claim(repo, item[0])
-		if item[0] == 'P569' or item[0] == 'P570':
+		if item[0] in ['P569', 'P570']:
 			claim.setTarget(item[1])
 		else:
 			claim.setTarget(pywikibot.ItemPage(repo, item[1]))
 		try:
-			candidate_item.addClaim(claim, summary=u'Setting '+item[0]+' value')
+			candidate_item.addClaim(claim, summary=f'Setting {item[0]} value')
 			claim.addSources([statedin, retrieved], summary=u'Add source.')
 		except:
 			print("That didn't work")
